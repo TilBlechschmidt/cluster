@@ -1,3 +1,5 @@
+# This requires the pull secret to be placed in the same namespace
+# flux create secret oci registry-password --url=flux.blechschmidt.dev --username=flux --password='...'
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: OCIRepository
 metadata:
@@ -5,10 +7,12 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  insecure: true
-  url: oci://registry.flux-system/ci
+  url: oci://flux.blechschmidt.dev/ci
   ref:
     tag: latest
+  provider: generic
+  secretRef:
+    name: registry-password
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

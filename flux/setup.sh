@@ -10,6 +10,10 @@ flux push artifact oci://127.0.0.1:5001/ci:latest \
 
 k apply -f flux.yml
 
+flux build artifact \
+    --path "../dist/k8s" \
+    --output /tmp/bla/artifact.tgz
+
 # flux push artifact oci://registry.flux-system/ci:$(git rev-parse --short HEAD) \
 #     --path="../dist/k8s" \
 #     --source="$(git config --get remote.origin.url)" \

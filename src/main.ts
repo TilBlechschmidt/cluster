@@ -11,6 +11,7 @@ import { Launch } from './chart/app/launch';
 
 import secrets from '../secrets.json';
 import { Concourse } from './chart/dev/concourse';
+import { Flux } from './chart/flux';
 
 class Infra extends Group {
     certManager: CertManager;
@@ -137,10 +138,21 @@ class Cluster extends App {
     }
 }
 
+class Bootstrap extends App {
+    constructor(props: AppProps = {}) {
+        super(props);
+
+        new Flux(this, 'flux', {
+            namespace: 'flux-system',
+            disableResourceNameHashes: true
+        });
+    }
+}
+
 // TODO:
 // - Add ConfigMap/Secret hash values
 // - Migrate Dev
-//     - Concourse
 //     - BuildKit
 
-new Cluster().synth();
+new Bootstrap({ outdir: 'dist/bootstrap' }).synth();
+new Cluster({ outdir: 'dist/cluster' }).synth();

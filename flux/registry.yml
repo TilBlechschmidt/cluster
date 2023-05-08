@@ -1,17 +1,14 @@
-# TODO Secure this registry somehow so it can't just be accessed via HTTP from any pod!
 apiVersion: v1
-kind: Service
+kind: Secret
 metadata:
-  name: registry
+  name: registry-basicauth
   namespace: flux-system
-  labels:
-    app: registry
-spec:
-  ports:
-  - port: 80
-    targetPort: 5000
-  selector:
-    app: registry
+stringData:
+  # Content generated with `docker run --rm -it --entrypoint htpasswd httpd:2 -Bn flux`
+  # rzjxpk7CHD0jqb2edq
+  # $2y$05$WZRA9VtcByIi9yg1poMu5.uMqxY33xV4.e9NxsFlMJiXtdvwyfL7e
+  htpasswd: |
+    flux:$2b$05$fSpnqXOgep892QHZBIUPMeCxkQarn/HnjUWsOuQzVI2/w9JTuMYjS
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -22,17 +19,101 @@ spec:
   selector:
     matchLabels:
       app: registry
-  serviceName: "registry"
+  serviceName: "registry2"
   replicas: 1
   template:
     metadata:
       labels:
         app: registry
     spec:
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: 5
       containers:
       - name: registry
         image: registry:2
+        env:
+        - name: "REGISTRY_AUTH"
+          value: "htpasswd"
+        - name: "REGISTRY_AUTH_HTPASSWD_REALM"
+          value: "Registry Realm"
+        - name: "REGISTRY_AUTH_HTPASSWD_PATH"
+          value: "/auth/htpasswd"
         ports:
         - containerPort: 5000
+          protocol: TCP
           name: web
+        volumeMounts:
+        - name: htpasswd
+          mountPath: "/auth"
+          readOnly: true
+        - name: image-volume
+          mountPath: "/var/lib/registry/docker"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: "RuntimeDefault"
+      volumes:
+      - name: htpasswd
+        secret:
+          secretName: registry-basicauth
+      - name: image-volume
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: flux-system
+  labels:
+    app: registry
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: registry
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry
+  namespace: flux-system
+  labels:
+    app: registry
+spec:
+  rules:
+    - host: flux.blechschmidt.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry
+                port:
+                  number: 80
+---
+# This is necessary because Flux disallows
+# everything in the namespace by default.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-registry
+  namespace: flux-system
+  labels:
+    app: registry
+spec:
+  ingress:
+  - from:
+    - namespaceSelector: {}
+  podSelector:
+    matchLabels:
+      app: registry
+  policyTypes:
+  - Ingress

@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "import": "cdk8s import --output src/imports",
-    "synth": "cdk8s synth --output dist/k8s",
+    "synth": "cdk8s synth -a yarn ts-node src/main.ts",
     "compile": "tsc --build",
     "watch": "tsc --build -w",
     "build": "yarn compile && yarn synth",
@@ -15,21 +15,18 @@
     "upgrade:next": "yarn i cdk8s@next cdk8s-cli@next"
   },
   "devDependencies": {
-    "@types/node": "^14.18.43",
     "@types/js-yaml": "^4.0.5",
+    "@types/node": "^14.18.43",
     "@types/pbkdf2": "^3.1.0",
-
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.5",
-
-    "cdk8s-cli": "^2.2.29",
+    "@types/bcrypt": "^5.0.0",
+    "bcrypt": "^5.1.0",
     "cdk8s": "^2.7.56",
-    "constructs": "^10.2.15",
-
-    "cdk8s-plus-25": "^2.7.17",
+    "cdk8s-cli": "^2.2.29",
     "cdk8s-plus-26": "^2.3.17",
-
+    "constructs": "^10.2.15",
     "js-yaml": "^4.1.0",
-    "pbkdf2": "^3.1.2"
+    "pbkdf2": "^3.1.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
   }
 }
