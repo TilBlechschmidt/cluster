@@ -13,6 +13,6 @@ RUN curl -s https://fluxcd.io/install.sh | bash
 
 WORKDIR /cdk8s
 COPY package.json .
-RUN yarn
+RUN yarn install --dev
 
 ENTRYPOINT ["/bin/bash"]
