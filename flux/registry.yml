@@ -1,0 +1,38 @@
+# TODO Secure this registry somehow so it can't just be accessed via HTTP from any pod!
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: flux-system
+  labels:
+    app: registry
+spec:
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: registry
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: registry
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app: registry
+  serviceName: "registry"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: registry
+        image: registry:2
+        ports:
+        - containerPort: 5000
+          name: web

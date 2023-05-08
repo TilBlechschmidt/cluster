@@ -1,0 +1,27 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: flux-registry-ci
+  namespace: flux-system
+spec:
+  interval: 1m
+  insecure: true
+  url: oci://registry.flux-system/ci
+  ref:
+    tag: latest
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: OCIRepository
+    name: flux-registry-ci
+  interval: 1m
+  retryInterval: 2m
+  path: ./
+  prune: true
+  wait: true
+  timeout: 2m
