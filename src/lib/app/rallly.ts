@@ -1,12 +1,12 @@
 import { Construct } from 'constructs';
-import { Chart, ChartProps, Size } from 'cdk8s';
+import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
-import { Postgres } from '../../lib/postgres';
+import { Postgres } from '../db/postgres';
 import { generateSecret } from '../../helpers';
 import { Domain } from '../infra/certManager';
 
-export interface RalllyProps extends ChartProps {
+export interface RalllyProps {
     readonly domain: Domain;
 
     readonly allowedEmails: string,
@@ -28,9 +28,9 @@ export interface RalllyMailProps {
     readonly tls: boolean;
 }
 
-export class Rallly extends Chart {
+export class Rallly extends Construct {
     constructor(scope: Construct, id: string, props: RalllyProps) {
-        super(scope, id, props);
+        super(scope, id);
 
         const db = 'rallly';
         const user = 'rallly';

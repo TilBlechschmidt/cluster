@@ -1,10 +1,10 @@
 import { Construct } from 'constructs';
-import { Chart, ChartProps, Helm } from 'cdk8s';
+import { Helm, Lazy } from 'cdk8s';
 import { Certificate, Issuer } from '../../imports/cert-manager.io';
 import { ConfigMap, Secret } from 'cdk8s-plus-26';
 import { HelmChartConfig } from '../../imports/helm.cattle.io';
 
-interface CertManagerProps extends ChartProps {
+interface CertManagerProps {
     acme: {
         email: string;
         server?: string;
@@ -24,27 +24,33 @@ export class Domain {
     readonly root: string;
     readonly fqdn: string;
 
-    constructor(root: string, fqdn: string) {
+    constructor(fqdn: string) {
+        const components = fqdn.split('.').reverse();
+        if (components.length > 3) throw 'Domains with more than one subdomain level are not supported';
+        const root = components.splice(0, 2).reverse().join('.');
+
         this.root = root;
         this.fqdn = fqdn;
     }
 }
 
-export class CertManager extends Chart {
+export class CertManager extends Construct {
     issuer: Issuer;
     domains: string[];
 
     private traefikNamespace: string;
 
     constructor(scope: Construct, id: string, props: CertManagerProps) {
-        super(scope, id, props);
+        super(scope, id);
 
         this.traefikNamespace = props.traefikNamespace || 'kube-system';
         this.domains = [];
 
         const manager = new Helm(this, id, {
             releaseName: id,
-            namespace: props.namespace,
+            // TODO Surely accessing a non-typed property is not the right way
+            // @ts-ignore
+            namespace: scope.namespace,
             chart: "cert-manager",
             version: "v1.11.1",
             repo: "https://charts.jetstack.io",
@@ -82,12 +88,31 @@ export class CertManager extends Chart {
         });
 
         this.issuer.addDependency(manager);
+
+        new ConfigMap(this, 'traefik-config', {
+            metadata: {
+                name: "traefik-cert-config",
+                namespace: this.traefikNamespace
+            },
+            data: {
+                "dynamic.toml": Lazy.any({ produce: () => this._synthConfig()})
+            }
+        });
+
+        new HelmChartConfig(this, 'traefik-values', {
+            metadata: {
+                name: "traefik",
+                namespace: this.traefikNamespace
+            },
+            spec: {
+                valuesContent: Lazy.any({ produce: () => this._synthValues()})
+            }
+        });
     }
 
     registerDomain(fqdn: string): Domain {
-        const components = fqdn.split('.').reverse();
-        if (components.length > 3) throw 'Domains with more than one subdomain level are not supported';
-        const root = components.splice(0, 2).reverse().join('.');
+        const domain = new Domain(fqdn);
+        const root = domain.root;
 
         if (this.domains.indexOf(root) === -1) {
             const dnsNames = [root, `*.${root}`];
@@ -110,41 +135,21 @@ export class CertManager extends Chart {
             this.domains.push(root);
         }
 
-        return new Domain(root, fqdn);
+        return domain;
     }
 
-    override toJson(): any[] {
-        const config = this.domains.map(root => `
+    _synthConfig(): string {
+        return this.domains.map(root => `
 [[tls.certificates]]
 certFile = "/certs/${root}/tls.crt"
 keyFile = "/certs/${root}/tls.key"`).join('\n');
+    }
 
-        const values = TRAEFIK_VALUES_HEAD + this.domains.map(root => `
+    _synthValues(): string {
+        return TRAEFIK_VALUES_HEAD + this.domains.map(root => `
   - name: ${this.secretName(root)}
     mountPath: "/certs/${root}"
     type: secret`).join('\n');
-
-        new ConfigMap(this, 'traefik-config', {
-            metadata: {
-                name: "traefik-cert-config",
-                namespace: this.traefikNamespace
-            },
-            data: {
-                "dynamic.toml": config
-            }
-        });
-
-        new HelmChartConfig(this, 'traefik-values', {
-            metadata: {
-                name: "traefik",
-                namespace: this.traefikNamespace
-            },
-            spec: {
-                valuesContent: values
-            }
-        });
-
-        return super.toJson();
     }
 
     private secretName(root: string): string {

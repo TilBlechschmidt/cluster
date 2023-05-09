@@ -1,13 +1,13 @@
 import { Construct } from 'constructs';
-import { Chart, ChartProps, Size, ApiObject, JsonPatch } from 'cdk8s';
+import { Size, ApiObject, JsonPatch, Lazy } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import * as yaml from 'js-yaml';
 import { Middleware } from '../../imports/traefik.containo.us';
 import { generateAutheliaDigest, generateSecret } from '../../helpers';
 import { Domain } from './certManager';
-import { PersistentVolumeClaim } from '../../lib/pvc';
+import { PersistentVolumeClaim } from '../k8s/pvc';
 
-interface AutheliaProps extends ChartProps {
+interface AutheliaProps {
     readonly secrets: AutheliaSecrets,
     readonly users: { [name: string]: AutheliaUser },
 
@@ -40,14 +40,14 @@ interface AutheliaSecrets {
     }
 }
 
-export class Authelia extends Chart {
+export class Authelia extends Construct {
     config: any;
     configMap: kplus.ConfigMap;
     discoveryUrl: string;
     domain: Domain;
 
     constructor(scope: Construct, id: string, props: AutheliaProps) {
-        super(scope, id, props);
+        super(scope, id);
 
         const encryption = props.secrets.encryption || {};
 
@@ -61,7 +61,11 @@ export class Authelia extends Chart {
             retain: true
         }).instance;
 
-        const configMap = new kplus.ConfigMap(this, 'config');
+        const configMap = new kplus.ConfigMap(this, 'config', {
+            data: {
+                "configuration.yaml": Lazy.any({ produce: () => yaml.dump(this.config) })
+            }
+        });
 
         const secretUsers = new kplus.Secret(this, 'users');
         secretUsers.addStringData("users.yaml", yaml.dump({ users: props.users }));
@@ -154,12 +158,6 @@ export class Authelia extends Chart {
         this.config.identity_providers.oidc.clients.push(client);
 
         return plaintextSecret;
-    }
-
-    override toJson(): any[] {
-        this.configMap.addData("configuration.yaml", yaml.dump(this.config));
-
-        return super.toJson();
     }
 }
 

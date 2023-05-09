@@ -1,11 +1,11 @@
-import { Chart, ChartProps, Helm, Size } from "cdk8s";
+import { Helm, Size } from "cdk8s";
 import { Construct } from "constructs";
 import { generateSecret } from "../../helpers";
-import { Postgres } from "../../lib/postgres";
+import { Postgres } from "../db/postgres";
 import { Authelia } from "../infra/authelia";
 import { Domain } from "../infra/certManager";
 
-interface ConcourseProps extends ChartProps {
+interface ConcourseProps {
     readonly domain: Domain;
     readonly oidc: Authelia;
 
@@ -13,9 +13,9 @@ interface ConcourseProps extends ChartProps {
     readonly user: string;
 }
 
-export class Concourse extends Chart {
+export class Concourse extends Construct {
     constructor(scope: Construct, id: string, props: ConcourseProps) {
-        super(scope, id, props);
+        super(scope, id);
 
         const oidcSecret = props.oidc.registerClient(id, {
             description: "Concourse CI",
@@ -79,7 +79,9 @@ export class Concourse extends Chart {
 
         new Helm(this, id, {
             releaseName: id,
-            namespace: props.namespace,
+            // TODO Surely accessing a non-typed property is not the right way
+            // @ts-ignore
+            namespace: scope.namespace,
             chart: "concourse",
             version: "v17.1.1",
             repo: "https://concourse-charts.storage.googleapis.com/",

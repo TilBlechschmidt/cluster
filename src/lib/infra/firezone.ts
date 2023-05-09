@@ -1,12 +1,12 @@
 import { Construct } from 'constructs';
-import { ApiObject, Chart, ChartProps, JsonPatch, Size } from 'cdk8s';
+import { ApiObject, JsonPatch, Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import { generateSecret } from '../../helpers';
 import { Authelia } from './authelia';
-import { Postgres } from '../../lib/postgres';
+import { Postgres } from '../db/postgres';
 import { Domain } from './certManager';
 
-interface FirezoneProps extends ChartProps {
+interface FirezoneProps {
     readonly defaultAdminEmail: string;
 
     readonly domain: Domain;
@@ -15,9 +15,9 @@ interface FirezoneProps extends ChartProps {
     readonly oidc: Authelia,
 }
 
-export class Firezone extends Chart {
+export class Firezone extends Construct {
     constructor(scope: Construct, id: string, props: FirezoneProps) {
-        super(scope, id, props);
+        super(scope, id);
 
         const oidcSecret = props.oidc.registerClient(id, {
             description: "Firezone VPN",

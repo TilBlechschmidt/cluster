@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
-import { PersistentVolumeClaim } from './pvc';
+import { PersistentVolumeClaim } from '../k8s/pvc';
 
 export interface PostgresProps {
     /// Name of the database to create

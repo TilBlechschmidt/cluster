@@ -1,17 +1,17 @@
 import { Construct } from 'constructs';
-import { Chart, ChartProps, Size } from 'cdk8s';
+import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
-import { ServiceAccount } from '../../lib/serviceAccount';
+import { ServiceAccount } from '../k8s/serviceAccount';
 import { Domain } from '../infra/certManager';
 
-export interface LaunchProps extends ChartProps {
+export interface LaunchProps {
     domains: Domain[]
 }
 
-export class Launch extends Chart {
-    constructor(scope: Construct, id: string, props: LaunchProps) {
-        super(scope, id, props);
+export class Launch extends Construct {
+    constructor(scope: Construct, id: string, _props: LaunchProps) {
+        super(scope, id);
 
         const serviceAccount = new ServiceAccount(this, 'ServiceAccount', {
             verbs: ["delete", "get", "list", "patch", "create", "update"],
