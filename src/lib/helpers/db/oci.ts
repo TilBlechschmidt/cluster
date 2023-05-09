@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { EnvValue, Secret, Service, StatefulSet, Volume } from 'cdk8s-plus-26';
 import { genSaltSync, hashSync } from 'bcrypt';
-import { Domain } from '../infra/certManager';
+import { Domain } from '../../infra/certManager';
 import { ApiObject, JsonPatch } from 'cdk8s';
 
 export interface RegistryProps {

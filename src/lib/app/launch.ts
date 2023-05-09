@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
-import { ServiceAccount } from '../k8s/serviceAccount';
+import { ServiceAccount } from '../helpers/k8s/serviceAccount';
 import { Domain } from '../infra/certManager';
 
 export interface LaunchProps {

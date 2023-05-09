@@ -1,7 +1,7 @@
 import { Helm, Size } from "cdk8s";
 import { Construct } from "constructs";
 import { generateSecret } from "../../helpers";
-import { Postgres } from "../db/postgres";
+import { Postgres } from "../helpers/db/postgres";
 import { Authelia } from "../infra/authelia";
 import { Domain } from "../infra/certManager";
 

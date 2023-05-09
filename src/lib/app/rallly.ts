@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
-import { Postgres } from '../db/postgres';
+import { Postgres } from '../helpers/db/postgres';
 import { generateSecret } from '../../helpers';
 import { Domain } from '../infra/certManager';
 

@@ -3,7 +3,7 @@ import { ApiObject, JsonPatch, Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import { generateSecret } from '../../helpers';
 import { Authelia } from './authelia';
-import { Postgres } from '../db/postgres';
+import { Postgres } from '../helpers/db/postgres';
 import { Domain } from './certManager';
 
 interface FirezoneProps {

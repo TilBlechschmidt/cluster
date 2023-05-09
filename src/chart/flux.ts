@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { ApiObject, Chart, ChartProps, Include, JsonPatch } from 'cdk8s';
-import { ContainerRegistry } from '../lib/db/oci';
+import { ContainerRegistry } from '../lib/helpers/db/oci';
 import { generateSecret } from '../helpers';
 import { Ingress, IngressBackend, Secret } from 'cdk8s-plus-26';
 import { Domain } from '../lib/infra/certManager';

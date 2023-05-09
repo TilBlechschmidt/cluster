@@ -5,7 +5,7 @@ import * as yaml from 'js-yaml';
 import { Middleware } from '../../imports/traefik.containo.us';
 import { generateAutheliaDigest, generateSecret } from '../../helpers';
 import { Domain } from './certManager';
-import { PersistentVolumeClaim } from '../k8s/pvc';
+import { PersistentVolumeClaim } from '../helpers/k8s/pvc';
 
 interface AutheliaProps {
     readonly secrets: AutheliaSecrets,
