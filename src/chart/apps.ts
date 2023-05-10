@@ -8,6 +8,7 @@ import { Launch } from '../lib/app/launch';
 import { Rallly } from '../lib/app/rallly';
 
 import secrets from '../../secrets.json';
+import { WebApp } from '../lib/helpers/webApp';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -17,18 +18,20 @@ export class Apps extends Chart {
     constructor(scope: Construct, id: string, props: AppsProps) {
         super(scope, id, props);
 
+        const registerDomain = (fqdn: string) => props.infra.certManager.registerDomain(fqdn);
+
         new Namespace(this, id);
-        
+
         new Launch(this, 'launch', {
             domains: [
-                props.infra.certManager.registerDomain('blechschmidt.dev'),
-                props.infra.certManager.registerDomain('blechschmidt.de'),
-                props.infra.certManager.registerDomain('groundtrack.app'),
+                registerDomain('blechschmidt.dev'),
+                registerDomain('blechschmidt.de'),
+                registerDomain('groundtrack.app'),
             ]
         });
 
         new Rallly(this, 'rallly', {
-            domain: props.infra.certManager.registerDomain('time.blechschmidt.de'),
+            domain: registerDomain('time.blechschmidt.de'),
 
             allowedEmails: '*@blechschmidt.de$',
             authRequired: true,
@@ -45,6 +48,13 @@ export class Apps extends Chart {
                 secure: true,
                 tls: true
             }
+        });
+
+        new WebApp(this, 'bin', {
+            domain: registerDomain('bin.blechschmidt.dev'),
+            image: 'ghcr.io/w4/bin:master',
+            args: ["--buffer-size", "100", "--max-paste-size", "1048576"],
+            port: 8000
         });
     }
 }
