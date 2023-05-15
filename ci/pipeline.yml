@@ -1,0 +1,17 @@
+resources:
+  - name: cdk8s
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/TilBlechschmidt/cluster
+      branch: main
+
+jobs:
+  - name: synth
+    plan:
+      - get: cdk8s
+        trigger: true
+      - task: synth
+        file: cdk8s/ci/synth.yml
+      - task: push
+        file: cdk8s/ci/push.yml

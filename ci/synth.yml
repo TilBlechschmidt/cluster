@@ -1,0 +1,21 @@
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: flux.blechschmidt.dev/cdk8s
+    username: flux
+    password: ((registry))
+
+inputs:
+  - name: cdk8s
+
+outputs:
+  - name: cluster
+    path: dist/cluster
+
+params:
+  SECRETS: ((cdk8s))
+
+run:
+  path: cdk8s/ci/synth

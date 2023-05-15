@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e -u
+
+cd cdk8s
+TAG=$(git rev-parse --short HEAD)
+SOURCE=$(git config --get remote.origin.url)
+REVISION=$(git branch --show-current)/$(git rev-parse HEAD)
+cd ..
+
+echo "Tag: $TAG"
+echo "Src: $SOURCE"
+echo "Rev: $REVISION"
+echo ""
+
+flux push artifact oci://flux.blechschmidt.dev/ci:$TAG \
+  --path="cluster" \
+  --source="$SOURCE" \
+  --revision="$REVISION" \
+  --creds flux:$REGISTRY_TOKEN
+
+echo ""
+
+flux tag artifact oci://flux.blechschmidt.dev/ci:$TAG \
+  --tag latest \
+  --creds flux:$REGISTRY_TOKEN

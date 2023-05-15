@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e -u
+
+cd cdk8s
+echo $SECRETS > secrets.json
+yarn install --dev --no-progress -s
+yarn synth -s
