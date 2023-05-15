@@ -65,7 +65,7 @@ export class Rallly extends Construct {
         const secret = new kplus.Secret(this, 'secrets', {
             stringData: {
                 SECRET_PASSWORD: generateSecret(`${id}-app`, 32),
-                DATABASE_URL: `postgres://${user}:${encodeURIComponent(password)}@${postgres.serviceName}:5432/${db}`,
+                DATABASE_URL: postgres.connectionURI,
                 SMTP_PWD: props.smtp.password
             }
         });
@@ -75,7 +75,7 @@ export class Rallly extends Construct {
             ports: [{ port: 80, targetPort: 3000 }],
         });
 
-        const statefulSet = new kplus.StatefulSet(this, 'app', {
+        new kplus.StatefulSet(this, 'app', {
             containers: [{
                 image: 'lukevella/rallly:2.11.0',
                 portNumber: 3000,
@@ -93,7 +93,7 @@ export class Rallly extends Construct {
         new kplus.Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
-                backend: kplus.IngressBackend.fromService(statefulSet.service)
+                backend: kplus.IngressBackend.fromService(service)
             }]
         });
     }

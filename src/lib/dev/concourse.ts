@@ -9,8 +9,8 @@ interface ConcourseProps {
     readonly domain: Domain;
     readonly oidc: Authelia;
 
-    /// User that is initially authenticated for the main team
-    readonly user: string;
+    /// Group that is authenticated for the main team
+    readonly group: string;
 }
 
 export class Concourse extends Construct {
@@ -44,6 +44,9 @@ export class Concourse extends Construct {
                     hosts: [props.domain.fqdn]
                 }
             },
+            worker: {
+                replicas: 1
+            },
             secrets: {
                 oidcClientId: id,
                 oidcClientSecret: oidcSecret,
@@ -60,7 +63,9 @@ export class Concourse extends Construct {
                     localAuth: { enabled: false },
                     auth: {
                         mainTeam: {
-                            oidc: { user: props.user }
+                            oidc: {
+                                group: props.group
+                            }
                         },
                         oidc: {
                             enabled: true,
@@ -68,9 +73,8 @@ export class Concourse extends Construct {
                             issuer: `https://${props.oidc.domain.fqdn}`,
                             skipEmailVerifiedValidation: true,
                             userNameKey: 'email',
-                            // TODO Group membership does not quite work :(
-                            //      This can be verified by using `group` instead of user @ mainTeam
                             groupsKey: 'groups',
+                            scope: 'openid email profile groups'
                         }
                     }
                 }

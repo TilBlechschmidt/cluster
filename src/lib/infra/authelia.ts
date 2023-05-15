@@ -14,6 +14,7 @@ interface AutheliaProps {
     readonly config: {
         readonly defaultRedirectUrl: string;
         readonly domain: string;
+        readonly defaultPolicy?: 'two_factor' | 'one_factor';
     },
 
     readonly domain: Domain;
@@ -51,10 +52,11 @@ export class Authelia extends Construct {
 
         const encryption = props.secrets.encryption || {};
 
-        let config = DEFAULT_CONFIG;
+        let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
         config.default_redirection_url = `https://${props.config.defaultRedirectUrl}`;
         config.totp.issuer = props.config.domain;
         config.session.domain = props.config.domain;
+        config.access_control.default_policy = props.config.defaultPolicy || 'two_factor';
 
         const claim = new PersistentVolumeClaim(this, 'db', {
             storage: Size.gibibytes(1),
@@ -150,7 +152,7 @@ export class Authelia extends Construct {
         const client = {
             id,
             secret: generateAutheliaDigest(plaintextSecret),
-            scopes: ["openid", "email", "profile"],
+            scopes: ["openid", "email", "profile", "groups"],
             grant_types: ["refresh_token", "authorization_code"],
             ...props
         };

@@ -5,6 +5,7 @@ import { Infra } from './infra';
 import { Namespace } from './namespace';
 
 import { Concourse } from '../lib/dev/concourse';
+import { Plausible } from '../lib/dev/plausible';
 
 export interface DevProps extends ChartProps {
     readonly infra: Infra;
@@ -19,7 +20,11 @@ export class Dev extends Chart {
         new Concourse(this, 'concourse', {
             oidc: props.infra.oidc,
             domain: props.infra.certManager.registerDomain('ci.blechschmidt.dev'),
-            user: 'tibl'
+            group: 'admins'
+        });
+
+        new Plausible(this, 'plausible', {
+            domain: props.infra.certManager.registerDomain('tracking.blechschmidt.dev'),
         });
     }
 }

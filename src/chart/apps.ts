@@ -9,6 +9,7 @@ import { Rallly } from '../lib/app/rallly';
 
 import secrets from '../../secrets.json';
 import { WebApp } from '../lib/helpers/webApp';
+import { Excalidraw } from '../lib/app/excalidraw';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -55,6 +56,10 @@ export class Apps extends Chart {
             image: 'ghcr.io/w4/bin:master',
             args: ["--buffer-size", "100", "--max-paste-size", "1048576"],
             port: 8000
+        });
+
+        new Excalidraw(this, 'excalidraw', {
+            domain: registerDomain('draw.blechschmidt.dev')
         });
     }
 }

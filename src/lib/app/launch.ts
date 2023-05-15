@@ -30,7 +30,7 @@ export class Launch extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/tilblechschmidt/launch:sha-f938248',
+            image: 'ghcr.io/tilblechschmidt/launch:sha-9ee6175',
             ports: [{ number: 80 }, { number: 8088 }],
             envVariables: {
                 /// TODO Pass list of allowed domains
