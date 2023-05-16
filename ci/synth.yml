@@ -12,10 +12,10 @@ inputs:
 
 outputs:
   - name: cluster
-    path: dist/cluster
 
 params:
   SECRETS: ((cdk8s))
+  JSII_SUPPRESS_UPGRADE_PROMPT: 1
 
 run:
   path: cdk8s/ci/synth
