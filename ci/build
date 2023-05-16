@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e -u
+
+buildctl \
+  --addr tcp://dev-buildkit.dev:1234 \
+  build \
+  --frontend dockerfile.v0 \
+  --opt platform=$PLATFORMS \
+  --local context=$CONTEXT \
+  --local dockerfile=$CONTEXT \
+  --progress plain \
+  --output type=oci,dest=image.tar
+
+echo "Extracting tarball"
+tar xf image.tar -C image/

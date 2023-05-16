@@ -6,6 +6,15 @@ resources:
       uri: https://github.com/TilBlechschmidt/cluster
       branch: main
 
+  - name: cdk8s-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: flux.blechschmidt.dev/cdk8s
+      tag: testing
+      username: flux
+      password: ((registry))
+
 jobs:
   - name: synth
     plan:
@@ -15,3 +24,13 @@ jobs:
         file: cdk8s/ci/synth.yml
       - task: push
         file: cdk8s/ci/push.yml
+
+  - name: build
+    plan:
+      - get: cdk8s
+        trigger: true
+      - task: build
+        file: cdk8s/ci/build.yml
+      - put: cdk8s-image
+        params:
+          image: image/

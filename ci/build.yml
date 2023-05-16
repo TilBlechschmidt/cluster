@@ -1,0 +1,20 @@
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: moby/buildkit
+    tag: master
+
+inputs:
+  - name: cdk8s
+
+outputs:
+  - name: image
+
+params:
+  PLATFORMS: linux/amd64,linux/arm64
+  CONTEXT: cdk8s
+
+run:
+  path: cdk8s/ci/build
