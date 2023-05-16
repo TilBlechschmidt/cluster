@@ -19,7 +19,7 @@ export class PersistentVolumeClaim extends Construct {
     constructor(scope: Construct, id: string, props: PersistentVolumeClaimProps) {
         super(scope, id);
 
-        const claim = new kplus.PersistentVolumeClaim(this, 'db', {
+        const claim = new kplus.PersistentVolumeClaim(this, id, {
             storage: props.storage,
             accessModes: [kplus.PersistentVolumeAccessMode.READ_WRITE_ONCE],
         });
