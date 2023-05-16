@@ -11,7 +11,7 @@ resources:
     icon: docker
     source:
       repository: flux.blechschmidt.dev/cdk8s
-      tag: testing
+      tag: latest
       username: flux
       password: ((registry))
 
