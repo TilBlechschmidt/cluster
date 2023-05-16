@@ -5,6 +5,7 @@ import { generateSecret } from '../../helpers';
 import { Authelia } from './authelia';
 import { Postgres } from '../helpers/db/postgres';
 import { Domain } from './certManager';
+import { PersistentVolumeClaim } from '../helpers/k8s/pvc';
 
 interface FirezoneProps {
     readonly defaultAdminEmail: string;
@@ -71,10 +72,10 @@ export class Firezone extends Construct {
             }
         });
 
-        const claim = new kplus.PersistentVolumeClaim(this, 'encr-keys', {
+        const claim = new PersistentVolumeClaim(this, 'encr-keys', {
             storage: Size.gibibytes(1),
-            accessModes: [kplus.PersistentVolumeAccessMode.READ_WRITE_ONCE]
-        });
+            retain: true
+        }).instance;
 
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
