@@ -3,9 +3,9 @@
 set -e -u
 
 cd cdk8s
-TAG=$(git rev-parse --short HEAD)
-SOURCE=$(git config --get remote.origin.url)
-REVISION=$(git branch --show-current)/$(git rev-parse HEAD)
+REVISION=$(cat .git/refs/heads/main)                # $(git branch --show-current)/$(git rev-parse HEAD)
+TAG=$(cat .git/refs/heads/main | head -c 7)
+SOURCE="https://github.com/TilBlechschmidt/cluster" # $(git config --get remote.origin.url)
 cd ..
 
 echo "Tag: $TAG"
