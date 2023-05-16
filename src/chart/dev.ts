@@ -6,6 +6,7 @@ import { Namespace } from './namespace';
 
 import { Concourse } from '../lib/dev/concourse';
 import { Plausible } from '../lib/dev/plausible';
+import { BuildKitDaemon } from '../lib/dev/buildkitd';
 
 export interface DevProps extends ChartProps {
     readonly infra: Infra;
@@ -22,6 +23,8 @@ export class Dev extends Chart {
             domain: props.infra.certManager.registerDomain('ci.blechschmidt.dev'),
             group: 'admins'
         });
+
+        new BuildKitDaemon(this, 'buildkit');
 
         new Plausible(this, 'plausible', {
             domain: props.infra.certManager.registerDomain('tracking.blechschmidt.dev'),
