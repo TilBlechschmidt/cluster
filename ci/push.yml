@@ -3,10 +3,8 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    # TODO Replace with official flux image :)
-    repository: flux.blechschmidt.dev/cdk8s
-    username: flux
-    password: ((registry))
+    repository: fluxcd/flux-cli
+    tag: v2.0.0-rc.3
 
 inputs:
   - name: cdk8s
