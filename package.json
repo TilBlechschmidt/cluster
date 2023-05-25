@@ -21,7 +21,7 @@
     "@types/pbkdf2": "^3.1.0",
     "bcrypt": "^5.1.0",
     "cdk8s": "^2.7.56",
-    "cdk8s-cli": "^2.2.32",
+    "cdk8s-cli": "^2.2.43",
     "cdk8s-plus-26": "^2.3.17",
     "constructs": "^10.2.15",
     "js-yaml": "^4.1.0",

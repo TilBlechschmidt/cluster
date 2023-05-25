@@ -8,6 +8,7 @@ import { Firezone } from '../lib/infra/firezone';
 import { CertManager } from '../lib/infra/certManager';
 
 import secrets from '../../secrets.json';
+import { Librespeed } from '../lib/infra/librespeed';
 
 export class Infra extends Chart {
     certManager: CertManager;
@@ -50,6 +51,10 @@ export class Infra extends Chart {
             defaultAdminEmail: "til@blechschmidt.de",
 
             oidc: this.oidc
+        });
+
+        new Librespeed(this, 'librespeed', {
+            domain: this.certManager.registerDomain('speed.blechschmidt.dev')
         });
     }
 }

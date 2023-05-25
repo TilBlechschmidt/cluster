@@ -1,3 +1,4 @@
+import { EnvValue } from 'cdk8s-plus-26';
 import { execSync } from 'child_process';
 import { pbkdf2Sync } from 'pbkdf2';
 import secrets from '../secrets.json';
@@ -23,4 +24,14 @@ export function generateAutheliaDigest(password: string): string {
 
     if (output.indexOf('Digest: ') != 0) throw 'Authelia returned unexpected digest string: ' + output;
     return output.substring('Digest: '.length).trim();
+}
+
+export function obj2env(env: { [name: string]: string }): { [name: string]: EnvValue } {
+    const out: { [name: string]: EnvValue } = {};
+
+    Object.keys(env).forEach(name => {
+        out[name] = EnvValue.fromValue(env[name]);
+    });
+
+    return out;
 }
