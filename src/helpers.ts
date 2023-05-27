@@ -1,9 +1,13 @@
-import { EnvValue } from 'cdk8s-plus-26';
+import { EnvValue, Volume } from 'cdk8s-plus-26';
 import { execSync } from 'child_process';
+import { Construct } from 'constructs';
 import { pbkdf2Sync } from 'pbkdf2';
 import secrets from '../secrets.json';
 
 const SALT = 'uznkf5beRZNGe+BafDxU1MvUYgCrj3M/BxrjPqaZGzhRFwq1/FCxdcemZ8Oo5vN9Kn8LlpBkNqfAs0eS4XM1ew==';
+const HOST_PATH = '/var/lib/volumes/';
+
+let registeredHostPaths: string[] = [];
 
 export function generateSecret(id: string, length: number): string {
     return pbkdf2Sync(secrets.key, id + SALT, 100000, length, 'sha512').toString('base64');
@@ -34,4 +38,37 @@ export function obj2env(env: { [name: string]: string }): { [name: string]: EnvV
     });
 
     return out;
+}
+
+export function createHostPathVolume(scope: Construct, name: string): Volume {
+    if (name.indexOf('/') != -1) throw `HostPath volume name may not contain path separators '${name}'`;
+
+    const path = `${HOST_PATH}${resolvePath(scope)}-${name}`;
+
+    if (registeredHostPaths.indexOf(path) != -1) throw `Duplicate HostPath: '${path}'`;
+    registeredHostPaths.push(path);
+
+    return Volume.fromHostPath(scope, 'hostPath-' + name, name, { path });
+}
+
+function resolvePath(scope: Construct) {
+    const namespace = resolveNamespace(scope);
+    const id = resolveId(scope).reverse();
+
+    if (id[0] != namespace) return `${namespace}/${id.join('-')}`;
+    else return `${namespace}/${id.slice(1).join('-')}`;
+}
+
+function resolveId(scope: Construct | undefined): string[] {
+    if (!scope || !scope.node || scope.node.id === '') return [];
+    return [scope.node.id].concat(resolveId(scope.node.scope));
+}
+
+function resolveNamespace(scope: Construct | undefined): string | null {
+    // @ts-ignore
+    if (!scope || !scope.node) return null;
+    // @ts-ignore
+    if (scope.namespace) return scope.namespace;
+    // @ts-ignore
+    return resolveNamespace(scope.node.scope);
 }

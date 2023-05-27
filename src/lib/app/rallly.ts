@@ -1,5 +1,4 @@
 import { Construct } from 'constructs';
-import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
 import { Postgres } from '../helpers/db/postgres';
@@ -40,7 +39,6 @@ export class Rallly extends Construct {
             database: db,
             user,
             password,
-            storage: Size.gibibytes(1)
         });
 
         const configMap = new kplus.ConfigMap(this, 'config', {

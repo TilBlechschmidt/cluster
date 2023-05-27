@@ -1,7 +1,6 @@
 import { Construct } from 'constructs';
-import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
-import { PersistentVolumeClaim } from '../k8s/pvc';
+import { createHostPathVolume } from '../../../helpers';
 
 export interface PostgresProps {
     /// Name of the database to create
@@ -12,12 +11,6 @@ export interface PostgresProps {
 
     /// Password for the authorized user
     readonly password: string;
-
-    /// Storage allocation
-    readonly storage: Size;
-
-    /// Whether or not the PVC should be retained by flux
-    readonly retainClaim?: boolean;
 }
 
 export class Postgres extends Construct {
@@ -56,16 +49,7 @@ export class Postgres extends Construct {
             resources: {}
         });
 
-        const claim = new PersistentVolumeClaim(this, 'data', {
-            storage: props.storage,
-            retain: props.retainClaim
-        }).instance;
-
-        if (props.retainClaim) {
-            claim.metadata.addLabel("kustomize.toolkit.fluxcd.io/prune", "disabled");
-        }
-
-        container.mount('/var/lib/postgresql/data', kplus.Volume.fromPersistentVolumeClaim(this, 'pvc', claim));
+        container.mount('/var/lib/postgresql/data', createHostPathVolume(this, `data`));
 
         this.serviceName = service.name;
     }

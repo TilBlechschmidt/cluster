@@ -1,7 +1,6 @@
 import { Construct } from 'constructs';
-import { Size } from 'cdk8s';
-import { PersistentVolumeClaim } from '../k8s/pvc';
-import { Env, Secret, Service, ServiceType, StatefulSet, Volume } from 'cdk8s-plus-26';
+import { Env, Secret, Service, ServiceType, StatefulSet } from 'cdk8s-plus-26';
+import { createHostPathVolume } from '../../../helpers';
 
 export interface ClickhouseProps {
     /// Name of the database to create
@@ -12,12 +11,6 @@ export interface ClickhouseProps {
 
     /// Password for the authorized user
     readonly password: string;
-
-    /// Storage allocation
-    readonly storage: Size;
-
-    /// Whether or not the PVC should be retained by flux
-    readonly retainClaim?: boolean;
 }
 
 export class Clickhouse extends Construct {
@@ -56,16 +49,7 @@ export class Clickhouse extends Construct {
             resources: {}
         });
 
-        const claim = new PersistentVolumeClaim(this, 'data', {
-            storage: props.storage,
-            retain: props.retainClaim
-        }).instance;
-
-        if (props.retainClaim) {
-            claim.metadata.addLabel("kustomize.toolkit.fluxcd.io/prune", "disabled");
-        }
-
-        container.mount('/var/lib/clickhouse', Volume.fromPersistentVolumeClaim(this, 'pvc', claim));
+        container.mount('/var/lib/clickhouse', createHostPathVolume(this, `data`));
 
         this.serviceName = service.name;
     }

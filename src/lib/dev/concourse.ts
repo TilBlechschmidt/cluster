@@ -1,4 +1,4 @@
-import { Helm, Size } from "cdk8s";
+import { Helm } from "cdk8s";
 import { Construct } from "constructs";
 import { generateSecret } from "../../helpers";
 import { Postgres } from "../helpers/db/postgres";
@@ -30,8 +30,6 @@ export class Concourse extends Construct {
             database: postgresDb,
             user: postgresUser,
             password: postgresPassword,
-            storage: Size.gibibytes(1),
-            retainClaim: true
         });
 
         const values = {

@@ -1,9 +1,9 @@
 import { Construct } from 'constructs';
-import { Size } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 
 import { ServiceAccount } from '../helpers/k8s/serviceAccount';
 import { Domain } from '../infra/certManager';
+import { createHostPathVolume } from '../../helpers';
 
 export interface LaunchProps {
     domains: Domain[]
@@ -43,14 +43,7 @@ export class Launch extends Construct {
             }
         });
 
-        const claim = new kplus.PersistentVolumeClaim(this, 'data', {
-            storage: Size.gibibytes(5),
-            accessModes: [kplus.PersistentVolumeAccessMode.READ_WRITE_ONCE]
-        });
-
-        claim.metadata.addLabel("kustomize.toolkit.fluxcd.io/prune", "disabled");
-
-        container.mount('/var/www/bundles', kplus.Volume.fromPersistentVolumeClaim(this, 'pvc', claim));
+        container.mount('/var/www/bundles', createHostPathVolume(this, 'bundles'));
 
         new kplus.Service(this, 'api', {
             type: kplus.ServiceType.NODE_PORT,

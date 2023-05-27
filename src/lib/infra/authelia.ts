@@ -1,11 +1,10 @@
 import { Construct } from 'constructs';
-import { Size, ApiObject, JsonPatch, Lazy } from 'cdk8s';
+import { ApiObject, JsonPatch, Lazy } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import * as yaml from 'js-yaml';
 import { Middleware } from '../../imports/traefik.containo.us';
-import { generateAutheliaDigest, generateSecret } from '../../helpers';
+import { createHostPathVolume, generateAutheliaDigest, generateSecret } from '../../helpers';
 import { Domain } from './certManager';
-import { PersistentVolumeClaim } from '../helpers/k8s/pvc';
 
 interface AutheliaProps {
     readonly secrets: AutheliaSecrets,
@@ -58,11 +57,6 @@ export class Authelia extends Construct {
         config.session.domain = props.config.domain;
         config.access_control.default_policy = props.config.defaultPolicy || 'two_factor';
 
-        const claim = new PersistentVolumeClaim(this, 'db', {
-            storage: Size.gibibytes(1),
-            retain: true
-        }).instance;
-
         const configMap = new kplus.ConfigMap(this, 'config', {
             data: {
                 "configuration.yaml": Lazy.any({ produce: () => yaml.dump(this.config) })
@@ -111,7 +105,7 @@ export class Authelia extends Construct {
             }
         });
 
-        container.mount("/data", kplus.Volume.fromPersistentVolumeClaim(this, 'pvc', claim));
+        container.mount("/data", createHostPathVolume(this, 'db'));
         container.mount("/secrets", kplus.Volume.fromSecret(this, 'mounted-secrets', secretKeys));
         container.mount("/users", kplus.Volume.fromSecret(this, 'mounted-users', secretUsers));
         container.mount("/config", kplus.Volume.fromConfigMap(this, 'mounted-config', configMap));

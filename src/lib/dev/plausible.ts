@@ -1,4 +1,3 @@
-import { Size } from "cdk8s";
 import { ConfigMap, Env, Ingress, IngressBackend, Secret, Service, ServiceType, StatefulSet } from "cdk8s-plus-26";
 import { Construct } from "constructs";
 import { generateSecret } from "../../helpers";
@@ -19,16 +18,12 @@ export class Plausible extends Construct {
             database: 'plausible',
             user: 'plausible',
             password: generateSecret(`${id}-pg`, 16),
-            storage: Size.gibibytes(1),
-            retainClaim: true
         });
 
         const clickhouse = new Clickhouse(this, 'clickhouse', {
             database: 'plausible',
             user: 'plausible',
             password: generateSecret(`${id}-pg`, 16),
-            storage: Size.gibibytes(1),
-            retainClaim: true
         });
 
         const configMap = new ConfigMap(this, 'config');

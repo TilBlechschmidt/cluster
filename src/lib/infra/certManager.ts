@@ -95,7 +95,7 @@ export class CertManager extends Construct {
                 namespace: this.traefikNamespace
             },
             data: {
-                "dynamic.toml": Lazy.any({ produce: () => this._synthConfig()})
+                "dynamic.toml": Lazy.any({ produce: () => this._synthConfig() })
             }
         });
 
@@ -105,7 +105,7 @@ export class CertManager extends Construct {
                 namespace: this.traefikNamespace
             },
             spec: {
-                valuesContent: Lazy.any({ produce: () => this._synthValues()})
+                valuesContent: Lazy.any({ produce: () => this._synthValues() })
             }
         });
     }

@@ -1,11 +1,10 @@
 import { Construct } from 'constructs';
-import { ApiObject, JsonPatch, Size } from 'cdk8s';
+import { ApiObject, JsonPatch } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
-import { generateSecret } from '../../helpers';
+import { createHostPathVolume, generateSecret } from '../../helpers';
 import { Authelia } from './authelia';
 import { Postgres } from '../helpers/db/postgres';
 import { Domain } from './certManager';
-import { PersistentVolumeClaim } from '../helpers/k8s/pvc';
 
 interface FirezoneProps {
     readonly defaultAdminEmail: string;
@@ -45,8 +44,6 @@ export class Firezone extends Construct {
             database: CONFIG.DATABASE_NAME,
             user: CONFIG.DATABASE_USER,
             password: postgresPassword,
-            storage: Size.gibibytes(1),
-            retainClaim: true
         });
 
         const configMap = new kplus.ConfigMap(this, 'config', {
@@ -72,11 +69,6 @@ export class Firezone extends Construct {
             }
         });
 
-        const claim = new PersistentVolumeClaim(this, 'encr-keys', {
-            storage: Size.gibibytes(1),
-            retain: true
-        }).instance;
-
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
             ports: [{ port: 80, targetPort: 13000 }],
@@ -96,7 +88,7 @@ export class Firezone extends Construct {
             }
         });
 
-        container.mount("/var/firezone", kplus.Volume.fromPersistentVolumeClaim(this, 'pvc', claim));
+        container.mount("/var/firezone", createHostPathVolume(this, `encr-keys`));
 
         ApiObject.of(statefulSet).addJsonPatch(JsonPatch.add("/spec/template/spec/containers/0/securityContext/capabilities", { add: ["NET_ADMIN", "SYS_MODULE"] }));
 
