@@ -64,9 +64,9 @@ function resolveId(scope: Construct | undefined): string[] {
     return [scope.node.id].concat(resolveId(scope.node.scope));
 }
 
-function resolveNamespace(scope: Construct | undefined): string | null {
+export function resolveNamespace(scope: Construct | undefined): string | undefined {
     // @ts-ignore
-    if (!scope || !scope.node) return null;
+    if (!scope || !scope.node) return undefined;
     // @ts-ignore
     if (scope.namespace) return scope.namespace;
     // @ts-ignore

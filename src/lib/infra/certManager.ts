@@ -3,6 +3,7 @@ import { Helm, Lazy } from 'cdk8s';
 import { Certificate, Issuer } from '../../imports/cert-manager.io';
 import { ConfigMap, Secret } from 'cdk8s-plus-26';
 import { HelmChartConfig } from '../../imports/helm.cattle.io';
+import { resolveNamespace } from '../../helpers';
 
 interface CertManagerProps {
     acme: {
@@ -48,9 +49,7 @@ export class CertManager extends Construct {
 
         const manager = new Helm(this, id, {
             releaseName: id,
-            // TODO Surely accessing a non-typed property is not the right way
-            // @ts-ignore
-            namespace: scope.namespace,
+            namespace: resolveNamespace(scope),
             chart: "cert-manager",
             version: "v1.11.1",
             repo: "https://charts.jetstack.io",
@@ -158,6 +157,12 @@ keyFile = "/certs/${root}/tls.key"`).join('\n');
 }
 
 const TRAEFIK_VALUES_HEAD = `
+logs:
+  access:
+    enabled: false
+service:
+  spec:
+    externalTrafficPolicy: Local
 additionalArguments:
   - "--providers.file.filename=/config/dynamic.toml"
 ports:

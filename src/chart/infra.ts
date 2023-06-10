@@ -6,9 +6,9 @@ import { Namespace } from './namespace';
 import { Authelia } from '../lib/infra/authelia';
 import { Firezone } from '../lib/infra/firezone';
 import { CertManager } from '../lib/infra/certManager';
+import { Librespeed } from '../lib/infra/librespeed';
 
 import secrets from '../../secrets.json';
-import { Librespeed } from '../lib/infra/librespeed';
 
 export class Infra extends Chart {
     certManager: CertManager;
