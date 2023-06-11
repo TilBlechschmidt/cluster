@@ -28,6 +28,7 @@ export class Apps extends Chart {
                 registerDomain('blechschmidt.dev'),
                 registerDomain('blechschmidt.de'),
                 registerDomain('groundtrack.app'),
+                registerDomain('tibl.dev'),
             ]
         });
 
