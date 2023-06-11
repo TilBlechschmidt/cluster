@@ -53,14 +53,14 @@ export class Apps extends Chart {
         });
 
         new WebApp(this, 'bin', {
-            domain: registerDomain('bin.blechschmidt.dev'),
+            domain: registerDomain('bin.tibl.dev'),
             image: 'ghcr.io/w4/bin:master',
             args: ["--buffer-size", "100", "--max-paste-size", "1048576"],
             port: 8000
         });
 
         new Excalidraw(this, 'excalidraw', {
-            domain: registerDomain('draw.blechschmidt.dev')
+            domain: registerDomain('draw.tibl.dev')
         });
     }
 }

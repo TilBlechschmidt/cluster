@@ -13,7 +13,7 @@ echo "Src: $SOURCE"
 echo "Rev: $REVISION"
 echo ""
 
-flux push artifact oci://flux.blechschmidt.dev/ci:$TAG \
+flux push artifact oci://flux.tibl.dev/ci:$TAG \
   --path="cluster" \
   --source="$SOURCE" \
   --revision="$REVISION" \
@@ -21,6 +21,6 @@ flux push artifact oci://flux.blechschmidt.dev/ci:$TAG \
 
 echo ""
 
-flux tag artifact oci://flux.blechschmidt.dev/ci:$TAG \
+flux tag artifact oci://flux.tibl.dev/ci:$TAG \
   --tag latest \
   --creds flux:$REGISTRY_TOKEN

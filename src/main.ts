@@ -16,7 +16,7 @@ class Bootstrap extends App {
             namespace: 'flux-system',
             disableResourceNameHashes: true,
 
-            registryDomain: new Domain("flux.blechschmidt.dev"),
+            registryDomain: new Domain("flux.tibl.dev"),
             image: 'ci',
         });
     }

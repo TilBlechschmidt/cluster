@@ -12,7 +12,7 @@ kubectl port-forward -n flux-system service/flux-registry 5000:5000 &
 
 flux push artifact oci://127.0.0.1:5000/ci:latest \
     --path="dist/cluster" \
-    --source="https://blechschmidt.dev" \
+    --source="https://tibl.dev" \
     --revision="0" \
     --creds flux:<insert-password-stolen-from-flux-yaml-here>
 

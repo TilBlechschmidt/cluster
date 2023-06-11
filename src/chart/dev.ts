@@ -24,18 +24,18 @@ export class Dev extends Chart {
 
         new Concourse(this, 'concourse', {
             oidc: props.infra.oidc,
-            domain: props.infra.certManager.registerDomain('ci.blechschmidt.dev'),
+            domain: props.infra.certManager.registerDomain('ci.tibl.dev'),
             group: 'admins'
         });
 
         new BuildKitDaemon(this, 'buildkit');
 
         new Plausible(this, 'plausible', {
-            domain: props.infra.certManager.registerDomain('tracking.blechschmidt.dev'),
+            domain: props.infra.certManager.registerDomain('tracking.tibl.dev'),
         });
 
         new TelegramNotifier(this, 'tg-notify', {
-            domain: props.infra.certManager.registerDomain('telegram.blechschmidt.dev'),
+            domain: props.infra.certManager.registerDomain('telegram.tibl.dev'),
             token: secrets.telegramBotToken,
             secret: generateSecret('tg-notify', 32)
         });

@@ -29,7 +29,7 @@ export class Infra extends Chart {
         });
 
         this.oidc = new Authelia(this, 'authelia', {
-            domain: this.certManager.registerDomain('auth.blechschmidt.dev'),
+            domain: this.certManager.registerDomain('auth.tibl.dev'),
 
             users: secrets.authelia.users,
 
@@ -41,13 +41,13 @@ export class Infra extends Chart {
             },
 
             config: {
-                defaultRedirectUrl: "blechschmidt.dev",
-                domain: "blechschmidt.dev"
+                defaultRedirectUrl: "tibl.dev",
+                domain: "tibl.dev"
             }
         });
 
         new Firezone(this, 'firezone', {
-            domain: this.certManager.registerDomain('vpn.blechschmidt.dev'),
+            domain: this.certManager.registerDomain('vpn.tibl.dev'),
             port: 1194,
 
             defaultAdminEmail: "til@blechschmidt.de",
@@ -66,7 +66,7 @@ export class Infra extends Chart {
         });
 
         new Librespeed(this, 'librespeed', {
-            domain: this.certManager.registerDomain('speed.blechschmidt.dev')
+            domain: this.certManager.registerDomain('speed.tibl.dev')
         });
     }
 }

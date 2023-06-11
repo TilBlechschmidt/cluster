@@ -282,7 +282,7 @@ const DEFAULT_CONFIG = {
     },
     "session": {
         "name": "authelia_session",
-        "domain": "blechschmidt.dev",
+        "domain": "",
         "same_site": "lax",
         "expiration": "1h",
         "inactivity": "5m",
