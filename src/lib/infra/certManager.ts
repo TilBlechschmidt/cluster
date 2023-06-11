@@ -58,7 +58,12 @@ export class CertManager extends Construct {
             }
         });
 
-        const cloudflareToken = new Secret(this, 'cloudflare-token', {});
+        const cloudflareToken = new Secret(this, 'cloudflare-token', {
+            metadata: {
+                name: 'cloudflare',
+                namespace: this.traefikNamespace
+            }
+        });
         cloudflareToken.addStringData("token", props.cloudflareAccountKey);
 
         this.issuer = new Issuer(this, 'cloudflare', {
