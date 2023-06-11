@@ -11,7 +11,6 @@ import { Librespeed } from '../lib/infra/librespeed';
 import secrets from '../../secrets.json';
 import { Influx } from '../lib/helpers/db/influxdb';
 import { generateSecret } from '../helpers';
-import { Telegraf } from '../lib/infra/telegraf';
 
 export class Infra extends Chart {
     certManager: CertManager;
@@ -56,41 +55,18 @@ export class Infra extends Chart {
             oidc: this.oidc
         });
 
-        const influx = new Influx(this, 'influx', {
+        new Influx(this, 'influx', {
             user: 'admin',
             password: generateSecret('infra-influx', 32),
             bucket: 'monitoring',
             org: 'main',
             token: generateSecret('infra-influx-token', 32),
-            retention: '1y'
+            retention: '4w',
+            nodePort: 1202
         });
-
-        new Telegraf(this, 'telegraf', {
-            influx,
-            mountHostFilesystem: true,
-            config: TELEGRAF_CONFIG
-        })
 
         new Librespeed(this, 'librespeed', {
             domain: this.certManager.registerDomain('speed.blechschmidt.dev')
         });
     }
 }
-
-const TELEGRAF_CONFIG = `
-[agent]
-interval = "1s"
-hostname = "wryhta"
-
-[[inputs.cpu]]
-percpu = true
-totalcpu = true
-collect_cpu_time = false
-report_active = false
-
-[[outputs.influxdb_v2]]
-urls = ["\${INFLUX_URL}"]
-token = "$INFLUX_TOKEN"
-organization = "main"
-bucket = "monitoring"
-`;

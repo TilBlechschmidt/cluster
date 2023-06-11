@@ -16,7 +16,6 @@ export class Telegraf extends Construct {
         super(scope, id);
 
         const secret = new Secret(this, 'tokens');
-        secret.addStringData('HOST_MOUNT_PREFIX', '/hostfs');
 
         if (props.influx) {
             secret.addStringData('INFLUX_TOKEN', props.influx.token);
@@ -42,6 +41,12 @@ export class Telegraf extends Construct {
         container.mount('/etc/telegraf', Volume.fromConfigMap(this, 'cfg', configMap), { readOnly: true });
 
         if (props.mountHostFilesystem) {
+            secret.addStringData('HOST_MOUNT_PREFIX', '/hostfs');
+            secret.addStringData('HOST_PROC', '/hostfs/proc');
+            secret.addStringData('HOST_SYS', '/hostfs/sys');
+            secret.addStringData('HOST_VAR', '/hostfs/var');
+            secret.addStringData('HOST_RUN', '/hostfs/run');
+
             container.mount('/hostfs/proc', Volume.fromHostPath(this, 'proc', 'proc', { path: '/proc' }), { readOnly: true });
             container.mount('/hostfs/sys', Volume.fromHostPath(this, 'sys', 'sys', { path: '/sys' }), { readOnly: true });
             container.mount('/hostfs/var', Volume.fromHostPath(this, 'var', 'var', { path: '/sys' }), { readOnly: true });
