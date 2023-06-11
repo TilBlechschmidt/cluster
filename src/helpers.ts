@@ -1,6 +1,7 @@
 import { EnvValue, Volume } from 'cdk8s-plus-26';
 import { execSync } from 'child_process';
 import { Construct } from 'constructs';
+import { createHash } from 'crypto';
 import { pbkdf2Sync } from 'pbkdf2';
 import secrets from '../secrets.json';
 
@@ -48,7 +49,9 @@ export function createHostPathVolume(scope: Construct, name: string): Volume {
     if (registeredHostPaths.indexOf(path) != -1) throw `Duplicate HostPath: '${path}'`;
     registeredHostPaths.push(path);
 
-    return Volume.fromHostPath(scope, 'hostPath-' + name, name, { path });
+    return Volume.fromHostPath(scope, 'hostPath-' + name, name, {
+        path,
+    });
 }
 
 function resolvePath(scope: Construct) {
@@ -71,4 +74,8 @@ export function resolveNamespace(scope: Construct | undefined): string | undefin
     if (scope.namespace) return scope.namespace;
     // @ts-ignore
     return resolveNamespace(scope.node.scope);
+}
+
+export function sha256(content: string) {
+    return createHash('sha256').update(content).digest('hex')
 }
