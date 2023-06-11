@@ -10,7 +10,7 @@ export interface LaunchProps {
 }
 
 export class Launch extends Construct {
-    constructor(scope: Construct, id: string, _props: LaunchProps) {
+    constructor(scope: Construct, id: string, props: LaunchProps) {
         super(scope, id);
 
         const serviceAccount = new ServiceAccount(this, 'ServiceAccount', {
@@ -30,10 +30,10 @@ export class Launch extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/tilblechschmidt/launch:sha-9ee6175',
+            image: 'ghcr.io/tilblechschmidt/launch:sha-02853c0',
             ports: [{ number: 80 }, { number: 8088 }],
             envVariables: {
-                /// TODO Pass list of allowed domains
+                LAUNCH_DOMAINS: { value: props.domains.map(d => d.fqdn).join(',') },
                 LAUNCH_SERVICE: { value: service.name }
             },
             securityContext: {
