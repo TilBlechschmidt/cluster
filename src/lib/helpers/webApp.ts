@@ -31,7 +31,8 @@ export class WebApp extends Construct {
                 image: props.image,
                 portNumber: props.port,
                 args: props.args,
-                securityContext
+                securityContext,
+                resources: {}
             }]
         });
 

@@ -85,7 +85,8 @@ export class Firezone extends Construct {
             envFrom: [kplus.Env.fromSecret(secret), kplus.Env.fromConfigMap(configMap)],
             securityContext: {
                 ensureNonRoot: false
-            }
+            },
+            resources: {}
         });
 
         container.mount("/var/firezone", createHostPathVolume(this, `encr-keys`));

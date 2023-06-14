@@ -23,7 +23,8 @@ export class Grafana extends Construct {
             portNumber: 3000,
             securityContext: {
                 group: 472
-            }
+            },
+            resources: {}
         });
 
         container.mount('/var/lib/grafana', createHostPathVolume(this, 'data'));

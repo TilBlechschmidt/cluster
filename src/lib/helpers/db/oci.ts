@@ -48,7 +48,8 @@ export class ContainerRegistry extends Construct {
             securityContext: {
                 user: 1000,
                 group: 3000,
-            }
+            },
+            resources: {}
         });
 
         container.mount('/auth', Volume.fromSecret(this, 'htpasswd', secret));

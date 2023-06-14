@@ -32,7 +32,8 @@ export class Excalidraw extends Construct {
                         ensureNonRoot: false,
                         // TODO Use EmptyDir: /var/cache/nginx/client_temp
                         readOnlyRootFilesystem: false
-                    }
+                    },
+                    resources: {}
                 },
                 {
                     name: 'collab',
@@ -45,7 +46,8 @@ export class Excalidraw extends Construct {
                         ensureNonRoot: false,
                         // TODO Use EmptyDir: /usr/local/share/.cache/yarn
                         readOnlyRootFilesystem: false,
-                    }
+                    },
+                    resources: {}
                 }
             ]
         });

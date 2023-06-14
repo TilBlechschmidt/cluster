@@ -28,7 +28,8 @@ export class Librespeed extends Construct {
                 envVariables: obj2env({
                     TITLE: "Speedtest @ Geesthacht",
                     PASSWORD: "supersecret"
-                })
+                }),
+                resources: {}
             }]
         });
 

@@ -102,7 +102,8 @@ export class Authelia extends Construct {
             },
             securityContext: {
                 ensureNonRoot: false
-            }
+            },
+            resources: {}
         });
 
         container.mount("/data", createHostPathVolume(this, 'db'));

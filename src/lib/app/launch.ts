@@ -40,7 +40,8 @@ export class Launch extends Construct {
                 user: 1000,
                 group: 1000,
                 readOnlyRootFilesystem: false,
-            }
+            },
+            resources: {}
         });
 
         container.mount('/var/www/bundles', createHostPathVolume(this, 'bundles'));

@@ -35,7 +35,8 @@ export class BuildKitDaemon extends Construct {
                     readOnlyRootFilesystem: false
                 },
                 readiness: Probe.fromCommand(['buildctl', 'debug', 'workers']),
-                liveness: Probe.fromCommand(['buildctl', 'debug', 'workers'])
+                liveness: Probe.fromCommand(['buildctl', 'debug', 'workers']),
+                resources: {}
             }]
         });
 

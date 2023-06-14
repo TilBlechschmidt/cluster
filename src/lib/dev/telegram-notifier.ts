@@ -38,7 +38,8 @@ export class TelegramNotifier extends Construct {
                     user: 1000,
                     group: 1000,
                 },
-                envFrom: [Env.fromSecret(secret)]
+                envFrom: [Env.fromSecret(secret)],
+                resources: {}
             }]
         });
 

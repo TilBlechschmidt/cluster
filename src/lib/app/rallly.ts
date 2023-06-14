@@ -83,7 +83,8 @@ export class Rallly extends Construct {
                 ],
                 securityContext: {
                     ensureNonRoot: false
-                }
+                },
+                resources: {}
             }],
             service
         });
