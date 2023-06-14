@@ -11,6 +11,7 @@ import { Librespeed } from '../lib/infra/librespeed';
 import secrets from '../../secrets.json';
 import { Influx } from '../lib/helpers/db/influxdb';
 import { generateSecret } from '../helpers';
+import { Grafana } from '../lib/infra/grafana';
 
 export class Infra extends Chart {
     certManager: CertManager;
@@ -63,6 +64,10 @@ export class Infra extends Chart {
             token: generateSecret('infra-influx-token', 32),
             retention: '4w',
             nodePort: 1202
+        });
+
+        new Grafana(this, 'grafana', {
+            domain: this.certManager.registerDomain('grafana.tibl.dev'),
         });
 
         new Librespeed(this, 'librespeed', {
