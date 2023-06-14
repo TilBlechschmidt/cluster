@@ -68,6 +68,7 @@ export class Infra extends Chart {
 
         new Grafana(this, 'grafana', {
             domain: this.certManager.registerDomain('grafana.tibl.dev'),
+            oidc: this.oidc
         });
 
         new Librespeed(this, 'librespeed', {

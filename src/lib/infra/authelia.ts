@@ -166,6 +166,7 @@ export interface ClientRegistrationProps {
     grants?: string[],
 
     authorization_policy?: string,
+    userinfo_signing_algorithm?: string
 }
 
 const DEFAULT_CONFIG = {
