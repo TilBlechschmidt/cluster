@@ -22,7 +22,9 @@ export class Grafana extends Construct {
         const secret = new Secret(this, 'oidc', {
             stringData: {
                 GF_SERVER_ROOT_URL: `https://${props.domain.fqdn}`,
+                GF_AUTH_BASIC_ENABLED: 'false',
                 GF_AUTH_GENERIC_OAUTH_ENABLED: 'true',
+                GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: 'true',
                 GF_AUTH_GENERIC_OAUTH_NAME: 'Authelia',
                 GF_AUTH_GENERIC_OAUTH_CLIENT_ID: id,
                 GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: oidcSecret,
