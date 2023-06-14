@@ -3,8 +3,8 @@ import { Construct } from 'constructs';
 
 import { Namespace } from './namespace';
 
-// import { Authelia } from '../lib/infra/authelia';
 import { Infra } from './infra';
+// import { Authelia } from '../lib/infra/authelia';
 
 // import secrets from '../../secrets.json';
 
@@ -19,7 +19,7 @@ export class Testing extends Chart {
         new Namespace(this, id);
 
         // const oidc = new Authelia(this, 'authelia', {
-        //     domain: props.infra.certManager.registerDomain('auth2.blechschmidt.dev'),
+        //     domain: props.infra.certManager.registerDomain('auth2.tibl.dev'),
 
         //     users: secrets.authelia.users,
 
@@ -31,8 +31,8 @@ export class Testing extends Chart {
         //     },
 
         //     config: {
-        //         defaultRedirectUrl: "blechschmidt.dev",
-        //         domain: "blechschmidt.dev",
+        //         defaultRedirectUrl: "tibl.dev",
+        //         domain: "tibl.dev",
         //         defaultPolicy: 'one_factor'
         //     }
         // });

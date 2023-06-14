@@ -1,4 +1,4 @@
-import { Env, Ingress, IngressBackend, Secret, Service, ServiceType, StatefulSet } from "cdk8s-plus-26";
+import { Ingress, IngressBackend, Secret, Service, ServiceType, StatefulSet, Volume } from "cdk8s-plus-26";
 import { Construct } from "constructs";
 import { createHostPathVolume } from "../../helpers";
 import { Authelia } from "./authelia";
@@ -16,27 +16,46 @@ export class Grafana extends Construct {
         const oidcSecret = props.oidc.registerClient(id, {
             description: "Grafana monitoring",
             redirect_uris: [`https://${props.domain.fqdn}/login/generic_oauth`],
-            userinfo_signing_algorithm: 'none'
+            userinfo_signing_algorithm: 'none',
+            authorization_policy: 'one_factor'
         });
+
+        const config = `
+[server]
+root_url = https://${props.domain.fqdn}
+
+[explore]
+enabled = true
+
+[auth]
+disable_login_form = true
+oauth_auto_login = true
+
+[auth.basic]
+enabled = false
+
+[auth.generic_oauth]
+enabled = true
+name = Authelia
+icon = signin
+client_id = ${id}
+client_secret = ${oidcSecret}
+scopes = openid profile email groups
+empty_scopes = false
+auth_url = https://${props.oidc.domain.fqdn}/api/oidc/authorization
+token_url = https://${props.oidc.domain.fqdn}/api/oidc/token
+api_url = https://${props.oidc.domain.fqdn}/api/oidc/userinfo
+login_attribute_path = preferred_username
+groups_attribute_path = groups
+role_attribute_path = contains(groups[*], 'admins') && 'GrafanaAdmin' || 'Viewer'
+name_attribute_path = name
+use_pkce = true
+allow_assign_grafana_admin = true
+        `;
 
         const secret = new Secret(this, 'oidc', {
             stringData: {
-                GF_SERVER_ROOT_URL: `https://${props.domain.fqdn}`,
-                GF_AUTH_BASIC_ENABLED: 'false',
-                GF_AUTH_GENERIC_OAUTH_ENABLED: 'true',
-                GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: 'true',
-                GF_AUTH_GENERIC_OAUTH_NAME: 'Authelia',
-                GF_AUTH_GENERIC_OAUTH_CLIENT_ID: id,
-                GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: oidcSecret,
-                GF_AUTH_GENERIC_OAUTH_SCOPES: 'openid profile email groups',
-                GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES: 'false',
-                GF_AUTH_GENERIC_OAUTH_AUTH_URL: `https://${props.oidc.domain.fqdn}/api/oidc/authorization`,
-                GF_AUTH_GENERIC_OAUTH_TOKEN_URL: `https://${props.oidc.domain.fqdn}/api/oidc/token`,
-                GF_AUTH_GENERIC_OAUTH_API_URL: `https://${props.oidc.domain.fqdn}/api/oidc/userinfo`,
-                GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH: 'preferred_username',
-                GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH: 'groups',
-                GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH: 'name',
-                GF_AUTH_GENERIC_OAUTH_USE_PKCE: 'true'
+                'grafana.ini': config
             }
         });
 
@@ -48,16 +67,18 @@ export class Grafana extends Construct {
         const statefulSet = new StatefulSet(this, 'app', { service });
 
         const container = statefulSet.addContainer({
-            image: 'grafana/grafana:9.1.0',
+            image: 'grafana/grafana:10.0.0',
             portNumber: 3000,
-            envFrom: [Env.fromSecret(secret)],
+            // envFrom: [Env.fromSecret(secret)],
             securityContext: {
-                group: 472
+                group: 472,
+                user: 472
             },
             resources: {},
         });
 
         container.mount('/var/lib/grafana', createHostPathVolume(this, 'data'));
+        container.mount('/etc/grafana', Volume.fromSecret(this, 'config', secret));
 
         new Ingress(this, props.domain.fqdn, {
             rules: [{
