@@ -10,6 +10,7 @@ import { Rallly } from '../lib/app/rallly';
 import secrets from '../../secrets.json';
 import { WebApp } from '../lib/helpers/webApp';
 import { Excalidraw } from '../lib/app/excalidraw';
+import { Lnk } from '../lib/app/lnk';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -61,6 +62,10 @@ export class Apps extends Chart {
 
         new Excalidraw(this, 'excalidraw', {
             domain: registerDomain('draw.tibl.dev')
+        });
+
+        new Lnk(this, 'lnk', {
+            domain: registerDomain('l.tibl.dev')
         });
     }
 }
