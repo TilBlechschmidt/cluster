@@ -7,10 +7,6 @@ import { Namespace } from './namespace';
 import { Concourse } from '../lib/dev/concourse';
 import { Plausible } from '../lib/dev/plausible';
 import { BuildKitDaemon } from '../lib/dev/buildkitd';
-import { TelegramNotifier } from '../lib/dev/telegram-notifier';
-import { generateSecret } from '../helpers';
-
-import secrets from '../../secrets.json';
 
 export interface DevProps extends ChartProps {
     readonly infra: Infra;
@@ -32,12 +28,6 @@ export class Dev extends Chart {
 
         new Plausible(this, 'plausible', {
             domain: props.infra.certManager.registerDomain('tracking.tibl.dev'),
-        });
-
-        new TelegramNotifier(this, 'tg-notify', {
-            domain: props.infra.certManager.registerDomain('telegram.tibl.dev'),
-            token: secrets.telegramBotToken,
-            secret: generateSecret('tg-notify', 32)
         });
     }
 }
