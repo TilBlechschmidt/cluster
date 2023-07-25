@@ -67,5 +67,12 @@ export class Apps extends Chart {
         new Lnk(this, 'lnk', {
             domain: registerDomain('l.tibl.dev')
         });
+
+        new WebApp(this, 'gpcache', {
+            domain: registerDomain('gp.tibl.dev'),
+            image: 'ghcr.io/tilblechschmidt/gpcache:sha-e85cf77',
+            port: 3000,
+            env: secrets.gpcache,
+        });
     }
 }
