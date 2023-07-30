@@ -70,7 +70,7 @@ export class Apps extends Chart {
 
         new WebApp(this, 'gpcache', {
             domain: registerDomain('gp.tibl.dev'),
-            image: 'ghcr.io/tilblechschmidt/gpcache:sha-e85cf77',
+            image: 'ghcr.io/tilblechschmidt/gpcache:sha-8708578',
             port: 3000,
             env: secrets.gpcache,
         });
