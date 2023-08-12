@@ -11,6 +11,7 @@ import secrets from '../../secrets.json';
 import { WebApp } from '../lib/helpers/webApp';
 import { Excalidraw } from '../lib/app/excalidraw';
 import { Lnk } from '../lib/app/lnk';
+import { Jellyfin } from '../lib/app/jellyfin';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -73,6 +74,17 @@ export class Apps extends Chart {
             image: 'ghcr.io/tilblechschmidt/gpcache:sha-8708578',
             port: 3000,
             env: secrets.gpcache,
+        });
+
+        new Jellyfin(this, 'jellyfin', {
+            domain: registerDomain('media.tibl.dev'),
+            media: {
+                movies: '/mnt/raid/Media/Movies',
+                shows: '/mnt/raid/Media/Shows',
+                books: '/mnt/raid/Media/Books',
+                music: '/mnt/raid/Media/Music',
+                production: '/mnt/raid/Media/Video Production'
+            }
         });
     }
 }
