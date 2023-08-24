@@ -24,14 +24,18 @@ interface CertManagerProps {
 export class Domain {
     readonly root: string;
     readonly fqdn: string;
+    readonly path?: string;
 
-    constructor(fqdn: string) {
+    constructor(fqdn: string, path?: string) {
         const components = fqdn.split('.').reverse();
         if (components.length > 3) throw 'Domains with more than one subdomain level are not supported';
         const root = components.splice(0, 2).reverse().join('.');
 
+        if (path && !path.startsWith('/')) throw 'Domain path has to start with a `/`';
+
         this.root = root;
         this.fqdn = fqdn;
+        this.path = path;
     }
 }
 

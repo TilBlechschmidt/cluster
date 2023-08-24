@@ -1,5 +1,6 @@
 import { Env, Ingress, IngressBackend, Secret, Service, ServiceType, StatefulSet } from "cdk8s-plus-26";
 import { Construct } from "constructs";
+import { attachMiddlewares, restrictToLocalNetwork, stripPathPrefix } from "../../network";
 import { Domain } from "../infra/certManager";
 
 interface TelegramNotifierProps {
@@ -8,8 +9,10 @@ interface TelegramNotifierProps {
     /// Telegram bot token
     readonly token: string;
 
-    /// HTTP Bearer token required for incoming requests
-    readonly secret: string;
+    /// Identifier for the default chat
+    readonly chatID: string;
+
+    readonly restrictToLocalNetwork?: boolean;
 }
 
 export class TelegramNotifier extends Construct {
@@ -21,10 +24,10 @@ export class TelegramNotifier extends Construct {
             ports: [{ port: 3000, targetPort: 3000 }],
         });
 
-        const secret = new Secret(this, 'bearer', {
+        const secret = new Secret(this, 'tokens', {
             stringData: {
-                BEARER_TOKEN: props.secret,
-                TELOXIDE_TOKEN: props.token
+                TELOXIDE_TOKEN: props.token,
+                DEFAULT_CHAT_ID: props.chatID
             }
         });
 
@@ -32,7 +35,7 @@ export class TelegramNotifier extends Construct {
             service,
             containers: [{
                 name: 'telegram-notifier',
-                image: 'ghcr.io/tilblechschmidt/telegram-notifier:sha-baa1b94',
+                image: 'ghcr.io/tilblechschmidt/telegram-notifier:sha-059df26',
                 portNumber: 3000,
                 securityContext: {
                     user: 1000,
@@ -43,11 +46,17 @@ export class TelegramNotifier extends Construct {
             }]
         });
 
-        new Ingress(this, props.domain.fqdn, {
+        const ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
+                path: props.domain.path,
                 backend: IngressBackend.fromService(service)
             }]
         });
+
+        const middlewares = [];
+        if (props.restrictToLocalNetwork) middlewares.push(restrictToLocalNetwork(this));
+        if (props.domain.path) middlewares.push(stripPathPrefix(this, [props.domain.path]));
+        attachMiddlewares(ingress, middlewares);
     }
 }

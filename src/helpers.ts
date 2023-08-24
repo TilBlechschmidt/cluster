@@ -62,7 +62,7 @@ function resolvePath(scope: Construct) {
     else return `${namespace}/${id.slice(1).join('-')}`;
 }
 
-function resolveId(scope: Construct | undefined): string[] {
+export function resolveId(scope: Construct | undefined): string[] {
     if (!scope || !scope.node || scope.node.id === '') return [];
     return [scope.node.id].concat(resolveId(scope.node.scope));
 }
@@ -79,3 +79,4 @@ export function resolveNamespace(scope: Construct | undefined): string | undefin
 export function sha256(content: string) {
     return createHash('sha256').update(content).digest('hex')
 }
+
