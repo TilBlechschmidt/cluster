@@ -12,6 +12,8 @@ import { WebApp } from '../lib/helpers/webApp';
 import { Excalidraw } from '../lib/app/excalidraw';
 import { Lnk } from '../lib/app/lnk';
 import { Jellyfin } from '../lib/app/jellyfin';
+import { ScanServer } from '../lib/app/scanServer';
+import { generateSecret } from '../helpers';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -85,6 +87,11 @@ export class Apps extends Chart {
                 music: '/mnt/raid/Media/Music',
                 production: '/mnt/raid/Media/Video Production'
             }
+        });
+
+        new ScanServer(this, 'scanserv', {
+            domain: registerDomain('scan.tibl.dev'),
+            token: generateSecret('scanserv', 16),
         });
     }
 }

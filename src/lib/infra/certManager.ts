@@ -168,7 +168,7 @@ keyFile = "/certs/${root}/tls.key"`).join('\n');
 const TRAEFIK_VALUES_HEAD = `
 logs:
   access:
-    enabled: false
+    enabled: true
 service:
   spec:
     externalTrafficPolicy: Local
