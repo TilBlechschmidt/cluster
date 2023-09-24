@@ -28,7 +28,6 @@ interface AutheliaUser {
 }
 
 interface AutheliaSecrets {
-    readonly smtpPassword: string;
     readonly jwtToken?: string;
     readonly encryption?: {
         readonly sessionKey?: string;
@@ -37,6 +36,16 @@ interface AutheliaSecrets {
     readonly oidc: {
         readonly hmacSecret?: string,
         readonly privateKey: string
+    }
+    readonly smtp: {
+        readonly host: string,
+        readonly port: number,
+
+        readonly user: string,
+        readonly pass: string,
+
+        readonly domain: string,
+        readonly sender: string
     }
 }
 
@@ -57,6 +66,14 @@ export class Authelia extends Construct {
         config.session.domain = props.config.domain;
         config.access_control.default_policy = props.config.defaultPolicy || 'two_factor';
 
+        config.notifier.smtp.identifier = props.secrets.smtp.domain;
+        config.notifier.smtp.host = props.secrets.smtp.host;
+        config.notifier.smtp.port = props.secrets.smtp.port;
+        config.notifier.smtp.username = props.secrets.smtp.user;
+        config.notifier.smtp.sender = `${props.secrets.smtp.sender}@${props.secrets.smtp.domain}`;
+        config.notifier.smtp.startup_check_address = config.notifier.smtp.sender;
+        config.notifier.smtp.tls.server_name = props.secrets.smtp.host;
+
         const configMap = new kplus.ConfigMap(this, 'config', {
             data: {
                 "configuration.yaml": Lazy.any({ produce: () => yaml.dump(this.config) })
@@ -68,7 +85,7 @@ export class Authelia extends Construct {
 
         const secretKeys = new kplus.Secret(this, 'keys', {
             stringData: {
-                SMTP_PASSWORD: props.secrets.smtpPassword,
+                SMTP_PASSWORD: props.secrets.smtp.pass,
                 JWT_TOKEN: props.secrets.jwtToken || generateSecret(`authelia-${id}-jwt`, 48),
                 SESSION_ENCRYPTION_KEY: encryption.sessionKey || generateSecret(`authelia-${id}-encr-session`, 48),
                 STORAGE_ENCRYPTION_KEY: encryption.storageKey || generateSecret(`authelia-${id}-encr-storage`, 48),
@@ -303,19 +320,19 @@ const DEFAULT_CONFIG = {
     "notifier": {
         "disable_startup_check": false,
         "smtp": {
-            "host": "smtp.migadu.com",
+            "host": "",
             "port": 465,
             "timeout": "15s",
-            "username": "auth@blechschmidt.dev",
-            "sender": "auth@blechschmidt.dev",
-            "identifier": "blechschmidt.dev",
+            "username": "",
+            "sender": "",
+            "identifier": "tibl.dev",
             "subject": "[Authelia] {title}",
-            "startup_check_address": "auth@blechschmidt.dev",
+            "startup_check_address": "",
             "disable_html_emails": false,
             "disable_require_tls": false,
             "disable_starttls": false,
             "tls": {
-                "server_name": "smtp.migadu.com",
+                "server_name": "",
                 "skip_verify": false,
                 "minimum_version": "TLS1.2",
                 "maximum_version": "TLS1.3"

@@ -15,16 +15,14 @@ export interface RalllyProps {
 }
 
 export interface RalllyMailProps {
-    readonly noReply: string;
-    readonly support: string;
+    readonly host: string,
+    readonly port: number,
 
-    readonly host: string;
-    readonly port: number;
-    readonly user: string;
-    readonly password: string;
+    readonly user: string,
+    readonly pass: string,
 
-    readonly secure: boolean;
-    readonly tls: boolean;
+    readonly domain: string,
+    readonly sender: string
 }
 
 export class Rallly extends Construct {
@@ -49,14 +47,14 @@ export class Rallly extends Construct {
                 AUTH_REQUIRED: props.authRequired.toString(),
                 ALLOWED_EMAILS: props.allowedEmails,
 
-                NOREPLY_EMAIL: props.smtp.noReply,
-                SUPPORT_EMAIL: props.smtp.support,
+                NOREPLY_EMAIL: `${props.smtp.sender}@${props.smtp.domain}`,
+                SUPPORT_EMAIL: `${props.smtp.sender}@${props.smtp.domain}`,
 
                 SMTP_HOST: props.smtp.host,
                 SMTP_PORT: props.smtp.port.toString(),
                 SMTP_USER: props.smtp.user,
-                SMTP_SECURE: props.smtp.secure.toString(),
-                SMTP_TLS_ENABLED: props.smtp.tls.toString(),
+                SMTP_SECURE: true.toString(),
+                SMTP_TLS_ENABLED: true.toString(),
             }
         });
 
@@ -64,7 +62,7 @@ export class Rallly extends Construct {
             stringData: {
                 SECRET_PASSWORD: generateSecret(`${id}-app`, 32),
                 DATABASE_URL: postgres.connectionURI,
-                SMTP_PWD: props.smtp.password
+                SMTP_PWD: props.smtp.pass
             }
         });
 

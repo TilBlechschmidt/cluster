@@ -43,18 +43,7 @@ export class Apps extends Chart {
             allowedEmails: '*@blechschmidt.de$',
             authRequired: true,
 
-            smtp: {
-                noReply: 'noreply@blechschmidt.de',
-                support: 'rallly.tca@blechschmidt.de',
-
-                host: 'smtp.migadu.com',
-                port: 465,
-                user: 'noreply@blechschmidt.de',
-                password: secrets.rallly.smtpPassword,
-
-                secure: true,
-                tls: true
-            }
+            smtp: secrets.smtp,
         });
 
         new WebApp(this, 'bin', {

@@ -14,6 +14,11 @@ export function generateSecret(id: string, length: number): string {
     return pbkdf2Sync(secrets.key, id + SALT, 100000, length, 'sha512').toString('base64');
 }
 
+export function generateURLSafeSecret(id: string, length: number): string {
+    const secret = generateSecret(id, length);
+    return encodeURIComponent(secret).replace(/%/g, '');
+}
+
 export function generateAutheliaDigest(password: string): string {
     // TODO Figure out a way to do base64 w/ custom alphabet so we don't have to call into authelia/Docker
     //      https://sourceware.org/git/?p=glibc.git;a=blob;f=crypt/crypt_util.c;h=c9cf9ba59e457656f2eace768c0083c490b44805;hb=refs/heads/master#l250
@@ -42,6 +47,12 @@ export function obj2env(env: { [name: string]: string }): { [name: string]: EnvV
 }
 
 export function createHostPathVolume(scope: Construct, name: string): Volume {
+    return Volume.fromHostPath(scope, 'hostPath-' + name, name, {
+        path: buildHostPath(scope, name),
+    });
+}
+
+export function buildHostPath(scope: Construct, name: string): string {
     if (name.indexOf('/') != -1) throw `HostPath volume name may not contain path separators '${name}'`;
 
     const path = `${HOST_PATH}${resolvePath(scope)}-${name}`;
@@ -49,9 +60,7 @@ export function createHostPathVolume(scope: Construct, name: string): Volume {
     if (registeredHostPaths.indexOf(path) != -1) throw `Duplicate HostPath: '${path}'`;
     registeredHostPaths.push(path);
 
-    return Volume.fromHostPath(scope, 'hostPath-' + name, name, {
-        path,
-    });
+    return path;
 }
 
 function resolvePath(scope: Construct) {

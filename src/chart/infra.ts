@@ -35,7 +35,7 @@ export class Infra extends Chart {
             users: secrets.authelia.users,
 
             secrets: {
-                smtpPassword: secrets.authelia.smtpPassword,
+                smtp: secrets.smtp,
                 oidc: {
                     privateKey: secrets.authelia.oidc.privateKey
                 }
