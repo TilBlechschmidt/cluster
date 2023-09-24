@@ -14,6 +14,7 @@ import { Lnk } from '../lib/app/lnk';
 import { Jellyfin } from '../lib/app/jellyfin';
 import { ScanServer } from '../lib/app/scanServer';
 import { generateSecret } from '../helpers';
+import { Atuin } from '../lib/app/atuin';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -92,6 +93,11 @@ export class Apps extends Chart {
         new ScanServer(this, 'scanserv', {
             domain: registerDomain('scan.tibl.dev'),
             token: generateSecret('scanserv', 16),
+        });
+
+        new Atuin(this, 'atuin', {
+            domain: props.infra.certManager.registerDomain('shell.tibl.dev'),
+            openRegistration: true
         });
     }
 }
