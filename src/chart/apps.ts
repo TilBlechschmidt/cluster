@@ -97,7 +97,7 @@ export class Apps extends Chart {
 
         new Atuin(this, 'atuin', {
             domain: props.infra.certManager.registerDomain('shell.tibl.dev'),
-            openRegistration: true
+            openRegistration: false
         });
     }
 }
