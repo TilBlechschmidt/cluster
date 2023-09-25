@@ -8,12 +8,17 @@ import { Ingress, IngressBackend, Volume } from 'cdk8s-plus-26';
 
 export interface JellyfinProps {
     domain: Domain,
-    media: { [name: string]: string }
+    media: { [name: string]: string },
+    readOnlyMedia?: { [name: string]: string },
 }
 
 export class Jellyfin extends Construct {
+    readonly domain: Domain;
+
     constructor(scope: Construct, id: string, props: JellyfinProps) {
         super(scope, id);
+
+        this.domain = props.domain;
 
         const envVariables = obj2env({
             JELLYFIN_PublishedServerUrl: `https://${props.domain.fqdn}`,
@@ -68,6 +73,16 @@ export class Jellyfin extends Construct {
             const path = props.media[key];
 
             container.mount(`/media/${key}`, Volume.fromHostPath(this, `media-${key}`, `media-${key}`, { path }));
+        }
+
+        if (props.readOnlyMedia) {
+            for (let key in props.readOnlyMedia) {
+                const path = props.readOnlyMedia[key];
+
+                container.mount(`/media/${key}`, Volume.fromHostPath(this, `media-${key}`, `media-${key}`, { path }), {
+                    readOnly: true
+                });
+            }
         }
     }
 }

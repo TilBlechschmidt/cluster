@@ -15,6 +15,8 @@ import { Jellyfin } from '../lib/app/jellyfin';
 import { ScanServer } from '../lib/app/scanServer';
 import { generateSecret } from '../helpers';
 import { Atuin } from '../lib/app/atuin';
+import { TubeArchivist } from '../lib/app/tubeArchivist';
+import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -68,7 +70,7 @@ export class Apps extends Chart {
             env: secrets.gpcache,
         });
 
-        new Jellyfin(this, 'jellyfin', {
+        const jellyfin = new Jellyfin(this, 'jellyfin', {
             domain: registerDomain('media.tibl.dev'),
             media: {
                 movies: '/mnt/raid/Media/Movies',
@@ -76,7 +78,25 @@ export class Apps extends Chart {
                 books: '/mnt/raid/Media/Books',
                 music: '/mnt/raid/Media/Music',
                 production: '/mnt/raid/Media/Video Production'
+            },
+            readOnlyMedia: {
+                youtube: '/mnt/raid/Media/YouTube'
             }
+        });
+
+        const tubeArchivist = new TubeArchivist(this, 'tubearchivist', {
+            domain: props.infra.certManager.registerDomain('ta.tibl.dev'),
+            user: 'tibl',
+            pass: generateSecret('tubeArchivist', 16),
+            hostPath: '/mnt/raid/Media/YouTube'
+        });
+
+        new TubeArchivistJellyfinIntegration(this, 'tubeArchivist-jf', {
+            jellyfin,
+            tubeArchivist,
+
+            jellyfinToken: secrets.tubeArchivistJF.jellyfinToken,
+            tubeArchivistToken: secrets.tubeArchivistJF.tubeArchivistToken
         });
 
         new ScanServer(this, 'scanserv', {
