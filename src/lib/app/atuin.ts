@@ -47,7 +47,11 @@ export class Atuin extends Construct {
             envVariables: obj2env({
                 ATUIN_HOST: '0.0.0.0',
                 ATUIN_PORT: '3030',
-                ATUIN_OPEN_REGISTRATION: String(props.openRegistration)
+                ATUIN_OPEN_REGISTRATION: String(props.openRegistration),
+                ATUIN_LOG: 'info',
+                RUST_LOG: 'info',
+                ATUIN_MAX_HISTORY_LEN: '1000000',
+                atuin_max_history_length: '1000000'
             }),
             resources: {}
         });
