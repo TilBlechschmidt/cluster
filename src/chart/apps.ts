@@ -86,8 +86,7 @@ export class Apps extends Chart {
 
         const tubeArchivist = new TubeArchivist(this, 'tubearchivist', {
             domain: props.infra.certManager.registerDomain('ta.tibl.dev'),
-            user: 'tibl',
-            pass: generateSecret('tubeArchivist', 16),
+            authentication: props.infra.ldap,
             hostPath: '/mnt/raid/Media/YouTube'
         });
 

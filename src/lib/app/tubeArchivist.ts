@@ -6,14 +6,19 @@ import { createHostPathVolume, generateSecret, obj2env } from '../../helpers';
 import { Env, Ingress, IngressBackend, Secret, Volume } from 'cdk8s-plus-26';
 import { Redis } from '../helpers/db/redis';
 import { ElasticSearch } from '../helpers/db/elasticsearch';
+import { GlAuth } from '../infra/glauth';
 
 export interface TubeArchivistProps {
     readonly domain: Domain,
 
-    readonly user: string,
-    readonly pass: string,
+    readonly authentication: GlAuth | Credentials,
 
     readonly hostPath: string,
+}
+
+export interface Credentials {
+    readonly user: string,
+    readonly pass: string,
 }
 
 export class TubeArchivist extends Construct {
@@ -32,9 +37,28 @@ export class TubeArchivist extends Construct {
         const redis = new Redis(this, 'redis');
         
         const secret = new Secret(this, 'token');
-        secret.addStringData('TA_USERNAME', props.user);
-        secret.addStringData('TA_PASSWORD', props.pass);
         secret.addStringData('ELASTIC_PASSWORD', elasticPassword);
+
+        if (props.authentication instanceof GlAuth) {
+            const ldap = props.authentication;
+            secret.addStringData('TA_LDAP', 'true');
+            secret.addStringData('TA_LDAP_SERVER_URI', `ldap://${ldap.serviceName}`);
+            secret.addStringData('TA_LDAP_BIND_DN', `cn=${ldap.serviceAccount.id},${ldap.baseDN}`);
+            secret.addStringData('TA_LDAP_BIND_PASSWORD', ldap.serviceAccountPassword);
+            secret.addStringData('TA_LDAP_USER_ATTR_MAP_USERNAME', 'uid');
+            secret.addStringData('TA_LDAP_USER_ATTR_MAP_PERSONALNAME', 'givenName');
+            secret.addStringData('TA_LDAP_USER_ATTR_MAP_SURNAME', 'sn');
+            secret.addStringData('TA_LDAP_USER_ATTR_MAP_EMAIL', 'mail');
+            secret.addStringData('TA_LDAP_USER_BASE', `ou=users,${ldap.baseDN}`);
+            secret.addStringData('TA_LDAP_USER_FILTER', `(memberOf=ou=admin,ou=groups,${ldap.baseDN})`);
+
+            // This needs to be set bc of bad coding :P
+            secret.addStringData('TA_USERNAME', 'willnotbeusedanyway');
+            secret.addStringData('TA_PASSWORD', generateSecret(`${id}-ta-willnotbeusedanyway`, 16));
+        } else {
+            secret.addStringData('TA_USERNAME', props.authentication.user);
+            secret.addStringData('TA_PASSWORD', props.authentication.pass);
+        }
 
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
