@@ -12,10 +12,12 @@ import secrets from '../../secrets.json';
 import { Influx } from '../lib/helpers/db/influxdb';
 import { generateSecret } from '../helpers';
 import { Grafana } from '../lib/infra/grafana';
+import { GlAuth } from '../lib/infra/glauth';
 
 export class Infra extends Chart {
     certManager: CertManager;
     oidc: Authelia;
+    ldap: GlAuth;
 
     constructor(scope: Construct, id: string, props: ChartProps = {}) {
         super(scope, id, props);
@@ -29,10 +31,16 @@ export class Infra extends Chart {
             }
         });
 
+        this.ldap = new GlAuth(this, 'ldap', {
+            host: 'tibl',
+            tld: 'dev',
+            users: GlAuth.usersFromSecret(secrets.ldap.users)
+        });
+
         this.oidc = new Authelia(this, 'authelia', {
             domain: this.certManager.registerDomain('auth.tibl.dev'),
 
-            users: secrets.authelia.users,
+            backend: this.ldap,
 
             secrets: {
                 smtp: secrets.smtp,

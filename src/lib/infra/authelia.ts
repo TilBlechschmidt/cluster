@@ -5,10 +5,11 @@ import * as yaml from 'js-yaml';
 import { Middleware } from '../../imports/traefik.containo.us';
 import { createHostPathVolume, generateAutheliaDigest, generateSecret } from '../../helpers';
 import { Domain } from './certManager';
+import { GlAuth } from './glauth';
 
 interface AutheliaProps {
     readonly secrets: AutheliaSecrets,
-    readonly users: { [name: string]: AutheliaUser },
+    readonly backend: UserList | GlAuth,
 
     readonly config: {
         readonly defaultRedirectUrl: string;
@@ -17,6 +18,10 @@ interface AutheliaProps {
     },
 
     readonly domain: Domain;
+}
+
+interface UserList {
+    users: { [name: string]: AutheliaUser }
 }
 
 interface AutheliaUser {
@@ -58,6 +63,7 @@ export class Authelia extends Construct {
     constructor(scope: Construct, id: string, props: AutheliaProps) {
         super(scope, id);
 
+        const useLDAP = props.backend instanceof GlAuth;
         const encryption = props.secrets.encryption || {};
 
         let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
@@ -74,14 +80,41 @@ export class Authelia extends Construct {
         config.notifier.smtp.startup_check_address = config.notifier.smtp.sender;
         config.notifier.smtp.tls.server_name = props.secrets.smtp.host;
 
+        if (useLDAP) {
+            const ldap = props.backend;
+
+            config.authentication_backend.ldap = {
+                url: `ldap://${ldap.serviceName}`,
+                base_dn: ldap.baseDN,
+
+                user: `cn=${ldap.serviceAccount.id},${ldap.baseDN}`,
+                password: ldap.serviceAccountPassword,
+                
+                users_filter: '(&({username_attribute}={input})(objectClass=posixAccount))',
+                groups_filter: `(&(uniqueMember=cn={input},ou=login,ou=users,dc=tibl,dc=dev)(objectClass=posixGroup))`,
+                
+                username_attribute: 'cn',
+                display_name_attribute: 'displayName',
+                mail_attribute: 'mail',
+
+                group_name_attribute: 'ou',
+                additional_groups_dn: ''
+            };
+        } else {
+            config.authentication_backend.file = DEFAULT_FILE_BACKEND;
+        }
+
         const configMap = new kplus.ConfigMap(this, 'config', {
             data: {
                 "configuration.yaml": Lazy.any({ produce: () => yaml.dump(this.config) })
             }
         });
 
-        const secretUsers = new kplus.Secret(this, 'users');
-        secretUsers.addStringData("users.yaml", yaml.dump({ users: props.users }));
+        const secretBackend = new kplus.Secret(this, 'backend');
+        
+        if (!useLDAP) {
+            secretBackend.addStringData("users.yaml", yaml.dump({ users: props.backend.users }));
+        }
 
         const secretKeys = new kplus.Secret(this, 'keys', {
             stringData: {
@@ -125,8 +158,11 @@ export class Authelia extends Construct {
 
         container.mount("/data", createHostPathVolume(this, 'db'));
         container.mount("/secrets", kplus.Volume.fromSecret(this, 'mounted-secrets', secretKeys));
-        container.mount("/users", kplus.Volume.fromSecret(this, 'mounted-users', secretUsers));
         container.mount("/config", kplus.Volume.fromConfigMap(this, 'mounted-config', configMap));
+        
+        if (!useLDAP) {
+            container.mount("/backend", kplus.Volume.fromSecret(this, 'mounted-backend', secretBackend));
+        }
 
         ApiObject.of(statefulSet).addJsonPatch(JsonPatch.add("/spec/template/spec/enableServiceLinks", false));
 
@@ -186,6 +222,47 @@ export interface ClientRegistrationProps {
     userinfo_signing_algorithm?: string
 }
 
+const DEFAULT_FILE_BACKEND = {
+    "path": "/backend/users.yaml",
+    "watch": true,
+    "search": {
+        "email": false,
+        "case_insensitive": false
+    },
+    "password": {
+        "algorithm": "argon2",
+        "argon2": {
+            "variant": "argon2id",
+            "iterations": 3,
+            "memory": 65536,
+            "parallelism": 4,
+            "key_length": 32,
+            "salt_length": 16
+        },
+        "scrypt": {
+            "iterations": 16,
+            "block_size": 8,
+            "parallelism": 1,
+            "key_length": 32,
+            "salt_length": 16
+        },
+        "pbkdf2": {
+            "variant": "sha512",
+            "iterations": 310000,
+            "salt_length": 16
+        },
+        "sha2crypt": {
+            "variant": "sha512",
+            "iterations": 50000,
+            "salt_length": 16
+        },
+        "bcrypt": {
+            "variant": "standard",
+            "cost": 12
+        }
+    }
+};
+
 const DEFAULT_CONFIG = {
     "theme": "dark",
     "default_redirection_url": "",
@@ -240,49 +317,9 @@ const DEFAULT_CONFIG = {
     },
     "authentication_backend": {
         "password_reset": {
-            "disable": false,
+            "disable": true,
             "custom_url": ""
         },
-        "file": {
-            "path": "/users/users.yaml",
-            "watch": true,
-            "search": {
-                "email": false,
-                "case_insensitive": false
-            },
-            "password": {
-                "algorithm": "argon2",
-                "argon2": {
-                    "variant": "argon2id",
-                    "iterations": 3,
-                    "memory": 65536,
-                    "parallelism": 4,
-                    "key_length": 32,
-                    "salt_length": 16
-                },
-                "scrypt": {
-                    "iterations": 16,
-                    "block_size": 8,
-                    "parallelism": 1,
-                    "key_length": 32,
-                    "salt_length": 16
-                },
-                "pbkdf2": {
-                    "variant": "sha512",
-                    "iterations": 310000,
-                    "salt_length": 16
-                },
-                "sha2crypt": {
-                    "variant": "sha512",
-                    "iterations": 50000,
-                    "salt_length": 16
-                },
-                "bcrypt": {
-                    "variant": "standard",
-                    "cost": 12
-                }
-            }
-        }
     },
     "password_policy": {
         "standard": {

@@ -5,6 +5,7 @@ import { Domain } from "../infra/certManager";
 
 interface NextcloudProps {
     readonly domain: Domain,
+    readonly temporary?: boolean,
     
     readonly smtp?: {
         readonly host: string,
@@ -65,15 +66,17 @@ export class Nextcloud extends Construct {
 
         const deployment = nextcloud.apiObjects.find(o => o.kind === 'Deployment');
 
-        // Update the securityContext so we run as me!
-        deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/securityContext/runAsUser', 1000));
-        deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/securityContext/runAsGroup', 1000));
+        if (!props.temporary) {
+            // Update the securityContext so we run as me!
+            deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/securityContext/runAsUser', 1000));
+            deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/securityContext/runAsGroup', 1000));
 
-        // Patch the config dir from emptyDir to a hostPath one
-        deployment?.addJsonPatch(JsonPatch.remove('/spec/template/spec/volumes/0/emptyDir'));
-        deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/volumes/0/hostPath', {
-            path: buildHostPath(this, 'data')
-        }));
+            // Patch the config dir from emptyDir to a hostPath one
+            deployment?.addJsonPatch(JsonPatch.remove('/spec/template/spec/volumes/0/emptyDir'));
+            deployment?.addJsonPatch(JsonPatch.add('/spec/template/spec/volumes/0/hostPath', {
+                path: buildHostPath(this, 'data')
+            }));
+        }
     }
 }
 
