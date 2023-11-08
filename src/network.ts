@@ -3,9 +3,9 @@ import { Construct } from 'constructs';
 import { resolveId, resolveNamespace } from "./helpers";
 import { Ingress } from "cdk8s-plus-26";
 
-type MiddlewareIdentifier = string;
+export type MiddlewareIdentifier = string;
 
-function createMiddleware(scope: Construct, name: string, spec: MiddlewareSpec): MiddlewareIdentifier {
+export function createMiddleware(scope: Construct, name: string, spec: MiddlewareSpec): MiddlewareIdentifier {
     const namespace = resolveNamespace(scope);
     const constructID = resolveId(scope).reverse();
 

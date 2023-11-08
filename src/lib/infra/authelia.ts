@@ -2,10 +2,10 @@ import { Construct } from 'constructs';
 import { ApiObject, JsonPatch, Lazy } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import * as yaml from 'js-yaml';
-import { Middleware } from '../../imports/traefik.containo.us';
 import { createHostPathVolume, generateAutheliaDigest, generateSecret } from '../../helpers';
 import { Domain } from './certManager';
 import { GlAuth } from './glauth';
+import { createMiddleware, MiddlewareIdentifier } from '../../network';
 
 interface AutheliaProps {
     readonly secrets: AutheliaSecrets,
@@ -59,6 +59,8 @@ export class Authelia extends Construct {
     configMap: kplus.ConfigMap;
     discoveryUrl: string;
     domain: Domain;
+
+    forwardAuth: MiddlewareIdentifier;
 
     constructor(scope: Construct, id: string, props: AutheliaProps) {
         super(scope, id);
@@ -173,18 +175,15 @@ export class Authelia extends Construct {
             }]
         });
 
-        new Middleware(this, 'forwardAuth', {
-            metadata: {},
-            spec: {
-                forwardAuth: {
-                    address: `http://${service.name}.${service.metadata.namespace}.svc.cluster.local/api/verify?rd=https%3A%2F%2F${encodeURIComponent(props.domain.fqdn)}%2F`,
-                    authResponseHeaders: [
-                        "Remote-User",
-                        "Remote-Name",
-                        "Remote-Email",
-                        "Remote-Groups"
-                    ]
-                }
+        const forwardAuth = createMiddleware(this, 'fwdauth', {
+            forwardAuth: {
+                address: `http://${service.name}.${service.metadata.namespace}.svc.cluster.local/api/verify?rd=https%3A%2F%2F${encodeURIComponent(props.domain.fqdn)}%2F`,
+                authResponseHeaders: [
+                    "Remote-User",
+                    "Remote-Name",
+                    "Remote-Email",
+                    "Remote-Groups"
+                ]
             }
         });
 
@@ -192,16 +191,25 @@ export class Authelia extends Construct {
         this.configMap = configMap;
         this.domain = props.domain;
         this.discoveryUrl = `https://${props.domain.fqdn}/.well-known/openid-configuration`;
+        this.forwardAuth = forwardAuth;
     }
 
     registerClient(id: string, props: ClientRegistrationProps): string {
         const plaintextSecret = generateSecret(`oidc-${id}`, 32);
+        const scopes = ["openid", "email", "profile", "groups"];
+
+        if (props.allow_refresh) {
+            scopes.push("offline_access");
+            delete props.allow_refresh;
+        }
+
+        const secret = props.public ? {} : { secret: generateAutheliaDigest(plaintextSecret) };
 
         const client = {
             id,
-            secret: generateAutheliaDigest(plaintextSecret),
-            scopes: ["openid", "email", "profile", "groups"],
+            scopes,
             grant_types: ["refresh_token", "authorization_code"],
+            ...secret,
             ...props
         };
 
@@ -220,6 +228,10 @@ export interface ClientRegistrationProps {
 
     authorization_policy?: string,
     userinfo_signing_algorithm?: string
+
+    public?: boolean,
+    allow_refresh?: boolean,
+    consent_mode?: 'auto' | 'pre-configured' | 'implicit' | 'explicit'
 }
 
 const DEFAULT_FILE_BACKEND = {
@@ -378,10 +390,10 @@ const DEFAULT_CONFIG = {
     },
     "identity_providers": {
         "oidc": {
-            "access_token_lifespan": "1h",
             "authorize_code_lifespan": "1m",
-            "id_token_lifespan": "1h",
-            "refresh_token_lifespan": "90m",
+            "access_token_lifespan": "24h",
+            "id_token_lifespan": "24h",
+            "refresh_token_lifespan": "48h",
             "enforce_pkce": "public_clients_only",
             "enable_pkce_plain_challenge": false,
             "enable_client_debug_messages": false,

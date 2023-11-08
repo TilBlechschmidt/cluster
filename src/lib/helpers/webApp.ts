@@ -12,11 +12,13 @@ export interface WebAppProps {
     args?: string[];
     env?: { [key: string]: string };
 
-    unsafeMode?: boolean
+    unsafeMode?: boolean;
+    hostNetwork?: boolean;
 }
 
 export class WebApp extends Construct {
     container: Container
+    ingress: Ingress
 
     constructor(scope: Construct, id: string, props: WebAppProps) {
         super(scope, id);
@@ -34,7 +36,7 @@ export class WebApp extends Construct {
             ports: [{ port: 80, targetPort: props.port }],
         });
 
-        const statefulSet = new StatefulSet(this, 'app', { service });
+        const statefulSet = new StatefulSet(this, 'app', { service, hostNetwork: props.hostNetwork });
 
         this.container = statefulSet.addContainer({
             image: props.image,
@@ -45,7 +47,7 @@ export class WebApp extends Construct {
             resources: {},
         });
 
-        new Ingress(this, props.domain.fqdn, {
+        this.ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
                 backend: IngressBackend.fromService(service)

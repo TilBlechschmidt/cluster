@@ -17,6 +17,7 @@ import { generateSecret } from '../helpers';
 import { Atuin } from '../lib/app/atuin';
 import { TubeArchivist } from '../lib/app/tubeArchivist';
 import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
+import { MagicPack } from '../lib/app/magicpack';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -106,6 +107,22 @@ export class Apps extends Chart {
         new Atuin(this, 'atuin', {
             domain: props.infra.certManager.registerDomain('shell.tibl.dev'),
             openRegistration: false
+        });
+
+        new MagicPack(this, 'magicpack', {
+            domain: props.infra.certManager.registerDomain('wake.tibl.dev'),
+            authMiddleware: props.infra.oidc.forwardAuth,
+            computers: {
+                SuprimPC: {
+                    name: "Suprim PC",
+                    computer: {
+                        location: "Bedroom",
+                        name: "DESKTOP-OHMSG0R",
+                        dns: "DESKTOP-OHMSG0R.fritz.box",
+                        mac: "A8:A1:59:51:3D:0A",
+                    }
+                }
+            }
         });
     }
 }
