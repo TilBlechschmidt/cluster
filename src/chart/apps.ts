@@ -18,6 +18,7 @@ import { Atuin } from '../lib/app/atuin';
 import { TubeArchivist } from '../lib/app/tubeArchivist';
 import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 import { MagicPack } from '../lib/app/magicpack';
+import { Jrnl } from '../lib/app/jrnl';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -86,7 +87,7 @@ export class Apps extends Chart {
         });
 
         const tubeArchivist = new TubeArchivist(this, 'tubearchivist', {
-            domain: props.infra.certManager.registerDomain('ta.tibl.dev'),
+            domain: registerDomain('ta.tibl.dev'),
             authentication: props.infra.ldap,
             hostPath: '/mnt/raid/Media/YouTube'
         });
@@ -105,12 +106,12 @@ export class Apps extends Chart {
         });
 
         new Atuin(this, 'atuin', {
-            domain: props.infra.certManager.registerDomain('shell.tibl.dev'),
+            domain: registerDomain('shell.tibl.dev'),
             openRegistration: false
         });
 
         new MagicPack(this, 'magicpack', {
-            domain: props.infra.certManager.registerDomain('wake.tibl.dev'),
+            domain: registerDomain('wake.tibl.dev'),
             authMiddleware: props.infra.oidc.forwardAuth,
             computers: {
                 SuprimPC: {
@@ -123,6 +124,12 @@ export class Apps extends Chart {
                     }
                 }
             }
+        });
+
+        new Jrnl(this, 'jrnl', {
+            domain: registerDomain('jrnl.tibl.dev'),
+            oidc: props.infra.oidc,
+            group: 'journal'
         });
     }
 }
