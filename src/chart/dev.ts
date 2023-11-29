@@ -4,13 +4,8 @@ import { Construct } from 'constructs';
 import { Infra } from './infra';
 import { Namespace } from './namespace';
 
-import secrets from '../../secrets.json';
-
 import { Concourse } from '../lib/dev/concourse';
-import { Plausible } from '../lib/dev/plausible';
 import { BuildKitDaemon } from '../lib/dev/buildkitd';
-import { TelegramNotifier } from '../lib/dev/telegram-notifier';
-import { Domain } from '../lib/infra/certManager';
 
 export interface DevProps extends ChartProps {
     readonly infra: Infra;
@@ -30,16 +25,10 @@ export class Dev extends Chart {
 
         new BuildKitDaemon(this, 'buildkit');
 
-        new Plausible(this, 'plausible', {
-            domain: props.infra.certManager.registerDomain('tracking.tibl.dev'),
-        });
-
-        new TelegramNotifier(this, 'telegram-notifier', {
-            domain: new Domain('wryhta.fritz.box', '/telegram'),
-            token: secrets.telegramBot.token,
-            chatID: secrets.telegramBot.chatID,
-            restrictToLocalNetwork: true
-        });
+        // The ducking ClickHouse whatever database uses so insanely much storage for NOTHING, I'm sick of it :D
+        // new Plausible(this, 'plausible', {
+        //     domain: props.infra.certManager.registerDomain('tracking.tibl.dev'),
+        // });
 
         // new Minio(this, 'minio', {
         //     domain: props.infra.certManager.registerDomain('s3.tibl.dev'),
