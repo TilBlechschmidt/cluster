@@ -54,6 +54,8 @@ export class Jellyfin extends Construct {
                 // group: 1000,
                 ensureNonRoot: false,
                 readOnlyRootFilesystem: false,
+                privileged: true,
+                allowPrivilegeEscalation: true
             },
             resources: {}
         });
@@ -68,6 +70,7 @@ export class Jellyfin extends Construct {
         container.mount('/data', createHostPathVolume(this, 'data'));
         container.mount('/config', createHostPathVolume(this, 'config'));
         container.mount('/cache', createHostPathVolume(this, 'cache'));
+        container.mount('/dev/dri', Volume.fromHostPath(this, 'igpu', 'igpu', { path: '/dev/dri' }));
 
         for (let key in props.media) {
             const path = props.media[key];
