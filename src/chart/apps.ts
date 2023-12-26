@@ -20,6 +20,7 @@ import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 import { MagicPack } from '../lib/app/magicpack';
 import { Jrnl } from '../lib/app/jrnl';
 import { Nextcloud } from '../lib/app/nextcloud';
+import { Slash } from '../lib/app/slash';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -131,6 +132,11 @@ export class Apps extends Chart {
             domain: registerDomain('jrnl.tibl.dev'),
             oidc: props.infra.oidc,
             group: 'journal'
+        });
+
+        new Slash(this, 'slash', {
+            domain: registerDomain('s.tibl.dev'),
+            authMiddleware: props.infra.oidc.forwardAuth,
         });
 
         new Nextcloud(this, 'nc', {
