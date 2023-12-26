@@ -17,6 +17,26 @@ interface NextcloudProps {
         readonly domain: string,
         readonly sender: string
     }
+
+    // Unfortunately, LDAP can not be configured through static configs
+    // As a result, it needs to be manually enabled and configurated.
+    //
+    // 1. Log in as admin and enable the LDAP app
+    //
+    // 2. Go to the LDAP settings and enter the following
+    //
+    //      Host:       testing-ldap (or whatever the service name is)
+    //      Port:       389
+    //      UserDN:     cn=svc,dc=tibl,dc=dev
+    //      Password:   `glauth.serviceAccountPassword`
+    //      BaseDN:     dc=tibl,dc=dev
+    //
+    // 3. Go to the EXPERT tab
+    //
+    //      Internal Username Attribute:    cn
+    //      UUID Attribute for Users:       cn
+    //      UUID Attribute for Groups:      cn
+    //
 }
 
 export class Nextcloud extends Construct {
@@ -44,7 +64,7 @@ export class Nextcloud extends Construct {
             releaseName: id,
             namespace: resolveNamespace(scope),
             chart: "nextcloud",
-            version: "4.3.1",
+            version: "4.5.4",
             repo: "https://nextcloud.github.io/helm/",
             values: {
                 ingress: {
