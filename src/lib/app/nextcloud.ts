@@ -64,7 +64,7 @@ export class Nextcloud extends Construct {
             releaseName: id,
             namespace: resolveNamespace(scope),
             chart: "nextcloud",
-            version: "4.5.4",
+            version: "4.5.10",
             repo: "https://nextcloud.github.io/helm/",
             values: {
                 ingress: {
