@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import { ApiObject, JsonPatch, Lazy } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-26';
 import * as yaml from 'js-yaml';
-import { createHostPathVolume, generateAutheliaDigest, generateSecret } from '../../helpers';
+import { createHostPathVolume, generateAutheliaDigest, generateSecret, generateURLSafeSecret } from '../../helpers';
 import { Domain } from './certManager';
 import { GlAuth } from './glauth';
 import { createMiddleware, MiddlewareIdentifier } from '../../network';
@@ -194,8 +194,8 @@ export class Authelia extends Construct {
         this.forwardAuth = forwardAuth;
     }
 
-    registerClient(id: string, props: ClientRegistrationProps): string {
-        const plaintextSecret = generateSecret(`oidc-${id}`, 32);
+    registerClient(id: string, props: ClientRegistrationProps, urlSafeSecret: boolean = false): string {
+        const plaintextSecret = urlSafeSecret ? generateURLSafeSecret(`oidc-${id}`, 32) : generateSecret(`oidc-${id}`, 32);
         const scopes = ["openid", "email", "profile", "groups"];
 
         if (props.allow_refresh) {
