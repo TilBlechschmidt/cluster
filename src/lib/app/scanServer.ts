@@ -2,15 +2,18 @@ import { Construct } from 'constructs';
 import * as kplus from 'cdk8s-plus-26';
 
 import { Domain } from '../infra/certManager';
-import { createHostPathVolume } from '../../helpers';
-import { Env, EnvValue, Ingress, IngressBackend, Secret } from 'cdk8s-plus-26';
+import { Env, Ingress, IngressBackend, Secret } from 'cdk8s-plus-26';
 import { attachMiddlewares, restrictToLocalNetwork, stripPathPrefix } from '../../network';
 
 export interface ScanServerProps {
     readonly domain: Domain,
 
-    /// Auth token used to download files
-    readonly token: string,
+    /// WebDAV configuration
+    readonly webdav: {
+        readonly url: string,
+        readonly user: string,
+        readonly pass: string
+    }
 
     readonly restrictToLocalNetwork?: boolean;
 }
@@ -20,33 +23,29 @@ export class ScanServer extends Construct {
         super(scope, id);
 
         const secret = new Secret(this, 'token');
-        secret.addStringData('AUTH_TOKEN', props.token);
+        secret.addStringData('WEBDAV_URL', props.webdav.url);
+        secret.addStringData('WEBDAV_USER', props.webdav.user);
+        secret.addStringData('WEBDAV_PASS', props.webdav.pass);
 
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
             ports: [{ port: 80, targetPort: 3030 }],
         });
 
-        const statefulSet = new kplus.StatefulSet(this, 'app', {
+        new kplus.StatefulSet(this, 'app', {
             service,
             automountServiceAccountToken: true,
             securityContext: {
                 user: 1000,
                 group: 1000,
-            }
-        });
-
-        const container = statefulSet.addContainer({
-            image: 'ghcr.io/tilblechschmidt/scan-server:sha-4cb48ea',
-            ports: [{ number: 3030 }],
-            envFrom: [Env.fromSecret(secret)],
-            envVariables: {
-                STORAGE_PATH: EnvValue.fromValue('/storage')
             },
-            resources: {}
+            containers: [{
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-cb3b044',
+                ports: [{ number: 3030 }],
+                envFrom: [Env.fromSecret(secret)],
+                resources: {}
+            }]
         });
-
-        container.mount('/storage', createHostPathVolume(this, 'storage'));
 
         const ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{

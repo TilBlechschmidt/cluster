@@ -13,7 +13,6 @@ import { Excalidraw } from '../lib/app/excalidraw';
 import { Lnk } from '../lib/app/lnk';
 import { Jellyfin } from '../lib/app/jellyfin';
 import { ScanServer } from '../lib/app/scanServer';
-import { generateSecret } from '../helpers';
 import { Atuin } from '../lib/app/atuin';
 import { TubeArchivist } from '../lib/app/tubeArchivist';
 import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
@@ -105,7 +104,7 @@ export class Apps extends Chart {
 
         new ScanServer(this, 'scanserv', {
             domain: registerDomain('scan.tibl.dev'),
-            token: generateSecret('scanserv', 16),
+            webdav: secrets.webdav
         });
 
         new Atuin(this, 'atuin', {
