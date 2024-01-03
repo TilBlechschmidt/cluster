@@ -18,8 +18,7 @@ export class AudioBookShelf extends WebApp {
             redirect_uris: [
                 `https://${props.domain.fqdn}/auth/openid/callback`,
                 'audiobookshelf://oauth'
-            ],
-            authorization_policy: 'one_factor'
+            ]
         });
 
         super(scope, id, {
