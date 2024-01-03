@@ -21,6 +21,7 @@ import { Jrnl } from '../lib/app/jrnl';
 import { Nextcloud } from '../lib/app/nextcloud';
 import { Slash } from '../lib/app/slash';
 import { SeaFile } from '../lib/app/seafile';
+import { AudioBookShelf } from '../lib/app/audiobookshelf';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -72,6 +73,14 @@ export class Apps extends Chart {
             image: 'ghcr.io/tilblechschmidt/gpcache:sha-8708578',
             port: 3000,
             env: secrets.gpcache,
+        });
+
+        new AudioBookShelf(this, 'audiobookshelf', {
+            domain: registerDomain('audiobook.tibl.dev'),
+            oidc: props.infra.oidc,
+            media: {
+                books: '/mnt/raid/Media/Audiobooks',
+            }
         });
 
         const jellyfin = new Jellyfin(this, 'jellyfin', {
