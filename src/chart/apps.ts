@@ -18,7 +18,7 @@ import { TubeArchivist } from '../lib/app/tubeArchivist';
 import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 import { MagicPack } from '../lib/app/magicpack';
 import { Jrnl } from '../lib/app/jrnl';
-import { Nextcloud } from '../lib/app/nextcloud';
+import { HedgeDoc } from '../lib/app/hedgedoc';
 import { Slash } from '../lib/app/slash';
 import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
@@ -148,13 +148,13 @@ export class Apps extends Chart {
             authMiddleware: props.infra.oidc.forwardAuth,
         });
 
-        new Nextcloud(this, 'nc', {
-            domain: registerDomain('nc.tibl.dev'),
-            smtp: secrets.smtp
-        });
-
         new SeaFile(this, 'seafile', {
             domain: registerDomain('sf.tibl.dev'),
+            oidc: props.infra.oidc
+        });
+
+        new HedgeDoc(this, 'hedgedoc', {
+            domain: registerDomain('doc.tibl.dev'),
             oidc: props.infra.oidc
         });
     }
