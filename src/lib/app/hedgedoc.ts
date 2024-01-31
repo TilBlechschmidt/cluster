@@ -36,6 +36,7 @@ export class HedgeDoc extends WebApp {
 
                 CMD_OAUTH2_PROVIDERNAME: "Authelia",
                 CMD_OAUTH2_CLIENT_ID: id,
+                // TODO Pass this in through a secret!
                 CMD_OAUTH2_CLIENT_SECRET: clientSecret,
                 CMD_OAUTH2_SCOPE: "openid email profile",
                 CMD_OAUTH2_USER_PROFILE_USERNAME_ATTR: "sub",

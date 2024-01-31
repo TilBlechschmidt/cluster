@@ -22,6 +22,7 @@ import { HedgeDoc } from '../lib/app/hedgedoc';
 import { Slash } from '../lib/app/slash';
 import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
+import { Memos } from '../lib/app/memos';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -155,6 +156,11 @@ export class Apps extends Chart {
 
         new HedgeDoc(this, 'hedgedoc', {
             domain: registerDomain('doc.tibl.dev'),
+            oidc: props.infra.oidc
+        });
+
+        new Memos(this, 'memos', {
+            domain: registerDomain('memos.tibl.dev'),
             oidc: props.infra.oidc
         });
     }
