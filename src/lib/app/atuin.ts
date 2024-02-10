@@ -40,7 +40,7 @@ export class Atuin extends Construct {
         });
 
         const main = statefulset.addContainer({
-            image: 'ghcr.io/atuinsh/atuin:16.0',
+            image: 'ghcr.io/atuinsh/atuin:18.0.0',
             args: ['server', 'start'],
             ports: [{ number: 3030 }],
             envFrom: [Env.fromSecret(secret)],
