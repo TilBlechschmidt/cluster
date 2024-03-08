@@ -112,9 +112,14 @@ export class Apps extends Chart {
             tubeArchivistToken: secrets.tubeArchivistJF.tubeArchivistToken
         });
 
-        new ScanServer(this, 'scanserv', {
-            domain: registerDomain('scan.tibl.dev'),
-            webdav: secrets.webdav
+        new ScanServer(this, 'scanservtb', {
+            domain: registerDomain('scan-tibl.tibl.dev'),
+            webdav: secrets.webdav.tibl
+        });
+
+        new ScanServer(this, 'scanservub', {
+            domain: registerDomain('scan-ub.tibl.dev'),
+            webdav: secrets.webdav.ub
         });
 
         new Atuin(this, 'atuin', {
