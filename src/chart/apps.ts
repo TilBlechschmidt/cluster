@@ -38,9 +38,7 @@ export class Apps extends Chart {
 
         new Launch(this, 'launch', {
             domains: [
-                registerDomain('blechschmidt.dev'),
                 registerDomain('blechschmidt.de'),
-                registerDomain('groundtrack.app'),
                 registerDomain('tibl.dev'),
             ]
         });
