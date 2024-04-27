@@ -19,6 +19,8 @@ export interface ScanServerProps {
 }
 
 export class ScanServer extends Construct {
+    readonly ingress: Ingress;
+
     constructor(scope: Construct, id: string, props: ScanServerProps) {
         super(scope, id);
 
@@ -47,7 +49,7 @@ export class ScanServer extends Construct {
             }]
         });
 
-        const ingress = new Ingress(this, props.domain.fqdn, {
+        this.ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
                 path: props.domain.path,
@@ -58,6 +60,6 @@ export class ScanServer extends Construct {
         const middlewares = [];
         if (props.restrictToLocalNetwork) middlewares.push(restrictToLocalNetwork(this));
         if (props.domain.path) middlewares.push(stripPathPrefix(this, [props.domain.path]));
-        attachMiddlewares(ingress, middlewares);
+        attachMiddlewares(this.ingress, middlewares);
     }
 }

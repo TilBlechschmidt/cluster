@@ -110,12 +110,12 @@ export class Apps extends Chart {
             tubeArchivistToken: secrets.tubeArchivistJF.tubeArchivistToken
         });
 
-        new ScanServer(this, 'scanservtb', {
+        const scanTB = new ScanServer(this, 'scanservtb', {
             domain: registerDomain('scan-tibl.tibl.dev'),
             webdav: secrets.webdav.tibl
         });
 
-        new ScanServer(this, 'scanservub', {
+        const scanUB = new ScanServer(this, 'scanservub', {
             domain: registerDomain('scan-ub.tibl.dev'),
             webdav: secrets.webdav.ub
         });
@@ -161,7 +161,7 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos]) {
+        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos, scanTB, scanUB]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
