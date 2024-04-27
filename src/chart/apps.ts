@@ -19,7 +19,6 @@ import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 import { MagicPack } from '../lib/app/magicpack';
 import { Jrnl } from '../lib/app/jrnl';
 import { HedgeDoc } from '../lib/app/hedgedoc';
-import { Slash } from '../lib/app/slash';
 import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
 import { Memos } from '../lib/app/memos';
