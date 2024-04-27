@@ -20,7 +20,7 @@ export class Memos extends WebApp {
 
         super(scope, id, {
             domain: props.domain,
-            image: 'neosmemo/memos:0.19.1',
+            image: 'neosmemo/memos:0.21.0',
             port: 5230,
         });
 
