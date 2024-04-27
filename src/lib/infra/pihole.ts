@@ -8,7 +8,6 @@ const WILDCARD_CONFIG_NAME = '42-wildcards.conf'
 
 export interface PiHoleProps {
     readonly domain: Domain;
-    readonly nodePort: number;
 
     readonly auth: {
         /// Password for web interface, providing none will disable it

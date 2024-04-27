@@ -87,7 +87,6 @@ export class Infra extends Chart {
 
         const piHole = new PiHole(this, 'pihole', {
             domain: this.certManager.registerDomain('dns.tibl.dev'),
-            nodePort: 1111,
 
             auth: { middleware: this.oidc.forwardAuth },
 
