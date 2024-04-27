@@ -11,6 +11,9 @@ export interface PostgresProps {
 
     /// Password for the authorized user
     readonly password: string;
+
+    /// Optional image to use
+    readonly image?: string;
 }
 
 export class Postgres extends Construct {
@@ -39,7 +42,7 @@ export class Postgres extends Construct {
         const statefulSet = new kplus.StatefulSet(this, 'db', { service });
 
         const container = statefulSet.addContainer({
-            image: 'postgres:15.2-alpine3.17',
+            image: props.image ?? 'postgres:15.2-alpine3.17',
             portNumber: 5432,
             envFrom: [kplus.Env.fromSecret(secret)],
             securityContext: {

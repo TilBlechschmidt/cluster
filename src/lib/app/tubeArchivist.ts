@@ -24,18 +24,19 @@ export interface Credentials {
 export class TubeArchivist extends Construct {
     readonly domain: Domain;
     readonly hostPath: string;
+    readonly ingress: Ingress;
 
     constructor(scope: Construct, id: string, props: TubeArchivistProps) {
         super(scope, id);
-        
+
         const elasticPassword = generateSecret(`${id}-es`, 32);
 
         const elasticSearch = new ElasticSearch(this, 'es', {
-        	password: elasticPassword
+            password: elasticPassword
         });
 
         const redis = new Redis(this, 'redis');
-        
+
         const secret = new Secret(this, 'token');
         secret.addStringData('ELASTIC_PASSWORD', elasticPassword);
 
@@ -97,7 +98,7 @@ export class TubeArchivist extends Construct {
             path: props.hostPath,
         }));
 
-        new Ingress(this, props.domain.fqdn, {
+        this.ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
                 backend: IngressBackend.fromService(service, { port: 80 })

@@ -10,6 +10,8 @@ export interface GrafanaProps {
 }
 
 export class Grafana extends Construct {
+    readonly ingress: Ingress;
+
     constructor(scope: Construct, id: string, props: GrafanaProps) {
         super(scope, id);
 
@@ -80,7 +82,7 @@ allow_assign_grafana_admin = true
         container.mount('/var/lib/grafana', createHostPathVolume(this, 'data'));
         container.mount('/etc/grafana', Volume.fromSecret(this, 'config', secret));
 
-        new Ingress(this, props.domain.fqdn, {
+        this.ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{
                 host: props.domain.fqdn,
                 backend: IngressBackend.fromService(service)

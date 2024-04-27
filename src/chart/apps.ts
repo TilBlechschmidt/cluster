@@ -23,6 +23,7 @@ import { Slash } from '../lib/app/slash';
 import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
 import { Memos } from '../lib/app/memos';
+import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -74,7 +75,7 @@ export class Apps extends Chart {
             env: secrets.gpcache,
         });
 
-        new AudioBookShelf(this, 'audiobookshelf', {
+        const audioBookShelf = new AudioBookShelf(this, 'audiobookshelf', {
             domain: registerDomain('audiobook.tibl.dev'),
             oidc: props.infra.oidc,
             media: {
@@ -125,9 +126,8 @@ export class Apps extends Chart {
             openRegistration: false
         });
 
-        new MagicPack(this, 'magicpack', {
+        const magicPack = new MagicPack(this, 'magicpack', {
             domain: registerDomain('wake.tibl.dev'),
-            authMiddleware: props.infra.oidc.forwardAuth,
             computers: {
                 SuprimPC: {
                     name: "Suprim PC",
@@ -141,15 +141,10 @@ export class Apps extends Chart {
             }
         });
 
-        new Jrnl(this, 'jrnl', {
+        const jrnl = new Jrnl(this, 'jrnl', {
             domain: registerDomain('jrnl.tibl.dev'),
             oidc: props.infra.oidc,
             group: 'journal'
-        });
-
-        new Slash(this, 'slash', {
-            domain: registerDomain('s.tibl.dev'),
-            authMiddleware: props.infra.oidc.forwardAuth,
         });
 
         new SeaFile(this, 'seafile', {
@@ -162,9 +157,13 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        new Memos(this, 'memos', {
+        const memos = new Memos(this, 'memos', {
             domain: registerDomain('memos.tibl.dev'),
             oidc: props.infra.oidc
         });
+
+        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos]) {
+            attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
+        }
     }
 }

@@ -13,6 +13,8 @@ import { Influx } from '../lib/helpers/db/influxdb';
 import { generateSecret } from '../helpers';
 import { Grafana } from '../lib/infra/grafana';
 import { GlAuth } from '../lib/infra/glauth';
+import { PiHole } from '../lib/infra/pihole';
+import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 
 export class Infra extends Chart {
     certManager: CertManager;
@@ -74,7 +76,7 @@ export class Infra extends Chart {
             nodePort: 1202
         });
 
-        new Grafana(this, 'grafana', {
+        const grafana = new Grafana(this, 'grafana', {
             domain: this.certManager.registerDomain('grafana.tibl.dev'),
             oidc: this.oidc
         });
@@ -82,5 +84,31 @@ export class Infra extends Chart {
         new Librespeed(this, 'librespeed', {
             domain: this.certManager.registerDomain('speed.tibl.dev')
         });
+
+        const piHole = new PiHole(this, 'pihole', {
+            domain: this.certManager.registerDomain('dns.tibl.dev'),
+            nodePort: 1111,
+
+            auth: { middleware: this.oidc.forwardAuth },
+
+            upstreams: [
+                '1.1.1.1',
+                '1.0.0.1',
+                '2606:4700:4700::1111',
+                '2606:4700:4700::1001'
+            ],
+            router: {
+                domain: 'fritz.box',
+                ip: '10.0.0.1',
+                cidr: '10.0.0.0/24'
+            },
+
+            wildcards: { 'tibl.dev': '10.0.0.56' },
+            wildcardExclusions: ['backup.tibl.dev']
+        });
+
+        for (const app of [grafana, piHole]) {
+            attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
+        }
     }
 }

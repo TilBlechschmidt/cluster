@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 import { Namespace } from './namespace';
 
 import { Infra } from './infra';
+// import { GlAuth } from '../lib/infra/glauth';
 // import { Authelia } from '../lib/infra/authelia';
 
 // import secrets from '../../secrets.json';
@@ -18,10 +19,17 @@ export class Testing extends Chart {
 
         new Namespace(this, id);
 
+        // const glauth = new GlAuth(this, 'ldap', {
+        //     host: 'tibl',
+        //     tld: 'dev',
+
+        //     users: GlAuth.usersFromSecret(secrets.ldap.users)
+        // });
+
         // const oidc = new Authelia(this, 'authelia', {
         //     domain: props.infra.certManager.registerDomain('auth2.tibl.dev'),
 
-        //     users: secrets.authelia.users,
+        //     backend: glauth,
 
         //     secrets: {
         //         smtp: secrets.smtp,
@@ -39,7 +47,7 @@ export class Testing extends Chart {
 
         // const secret = oidc.registerClient('test', {
         //     description: 'This is an example client for debug purposes',
-        //     redirect_uris: ['http://127.0.0.1:8080'],
+        //     redirect_uris: ['http://127.0.0.1:8080', 'http://127.0.0.1:8080/auth/callback'],
         //     authorization_policy: 'one_factor'
         // });
 
