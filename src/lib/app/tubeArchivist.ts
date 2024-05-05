@@ -71,7 +71,7 @@ export class TubeArchivist extends Construct {
         });
 
         const container = statefulset.addContainer({
-            image: 'bbilly1/tubearchivist:v0.4.1',
+            image: 'bbilly1/tubearchivist:v0.4.7',
             ports: [{ number: 8000 }],
             envFrom: [Env.fromSecret(secret)],
             envVariables: obj2env({

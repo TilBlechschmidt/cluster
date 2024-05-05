@@ -15,7 +15,6 @@ import { Jellyfin } from '../lib/app/jellyfin';
 import { ScanServer } from '../lib/app/scanServer';
 import { Atuin } from '../lib/app/atuin';
 import { TubeArchivist } from '../lib/app/tubeArchivist';
-import { TubeArchivistJellyfinIntegration } from '../lib/app/tubeArchivist-jf';
 import { MagicPack } from '../lib/app/magicpack';
 import { Jrnl } from '../lib/app/jrnl';
 import { HedgeDoc } from '../lib/app/hedgedoc';
@@ -82,7 +81,7 @@ export class Apps extends Chart {
             }
         });
 
-        const jellyfin = new Jellyfin(this, 'jellyfin', {
+        new Jellyfin(this, 'jellyfin', {
             domain: registerDomain('media.tibl.dev'),
             media: {
                 movies: '/mnt/raid/Media/Movies',
