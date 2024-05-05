@@ -43,7 +43,8 @@ export class Concourse extends Construct {
                 }
             },
             worker: {
-                replicas: 1
+                replicas: 1,
+                env: [{ name: "CONCOURSE_RUNTIME", value: "containerd" }]
             },
             secrets: {
                 oidcClientId: id,
@@ -85,7 +86,7 @@ export class Concourse extends Construct {
             // @ts-ignore
             namespace: scope.namespace,
             chart: "concourse",
-            version: "v17.1.1",
+            version: "v17.3.1",
             repo: "https://concourse-charts.storage.googleapis.com/",
             values
         });
