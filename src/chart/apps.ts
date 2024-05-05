@@ -102,14 +102,6 @@ export class Apps extends Chart {
             hostPath: '/mnt/raid/Media/YouTube'
         });
 
-        new TubeArchivistJellyfinIntegration(this, 'tubeArchivist-jf', {
-            jellyfin,
-            tubeArchivist,
-
-            jellyfinToken: secrets.tubeArchivistJF.jellyfinToken,
-            tubeArchivistToken: secrets.tubeArchivistJF.tubeArchivistToken
-        });
-
         const scanTB = new ScanServer(this, 'scanservtb', {
             domain: registerDomain('scan-tibl.tibl.dev'),
             webdav: secrets.webdav.tibl
