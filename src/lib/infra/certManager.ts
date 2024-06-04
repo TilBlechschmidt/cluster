@@ -169,16 +169,27 @@ const TRAEFIK_VALUES_HEAD = `
 logs:
   access:
     enabled: true
+    filePath: /var/log/traefik/access.log
 service:
   spec:
     externalTrafficPolicy: Local
 additionalArguments:
   - "--providers.file.filename=/config/dynamic.toml"
+  - "--accessLog.filters.statusCodes=400-499"
 ports:
   websecure:
     http3:
       enabled: true
       advertisedPort: 443
+additionalVolumeMounts:
+  - mountPath: /var/log/traefik
+    name: access-logs
+deployment:
+  additionalVolumes:
+    - name: access-logs
+      hostPath:
+        path: /var/log/traefik
+        type: DirectoryOrCreate
 volumes:
   - name: traefik-cert-config
     mountPath: "/config"
