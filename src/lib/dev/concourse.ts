@@ -1,4 +1,4 @@
-import { Helm } from "cdk8s";
+import { Helm, JsonPatch } from "cdk8s";
 import { Construct } from "constructs";
 import { generateSecret } from "../../helpers";
 import { Postgres } from "../helpers/db/postgres";
@@ -80,7 +80,7 @@ export class Concourse extends Construct {
             }
         };
 
-        new Helm(this, id, {
+        const concourse = new Helm(this, id, {
             releaseName: id,
             // TODO Surely accessing a non-typed property is not the right way
             // @ts-ignore
@@ -90,5 +90,9 @@ export class Concourse extends Construct {
             repo: "https://concourse-charts.storage.googleapis.com/",
             values
         });
+
+        // Euthanize the annoying PodDisruptionBudget that breaks `kubectl drain`
+        const disruptionBudget = concourse.apiObjects.find(o => o.kind === 'PodDisruptionBudget');
+        disruptionBudget?.addJsonPatch(JsonPatch.replace('/spec/minAvailable', 0))
     }
 }
