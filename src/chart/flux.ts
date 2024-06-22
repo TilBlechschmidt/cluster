@@ -7,6 +7,7 @@ import { Domain } from '../lib/infra/certManager';
 import { KubeNetworkPolicy } from '../imports/k8s';
 import { OciRepository } from '../imports/source.toolkit.fluxcd.io';
 import { Kustomization, KustomizationSpecSourceRefKind } from '../imports/kustomize.toolkit.fluxcd.io';
+import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 
 interface FluxProps extends ChartProps {
     registryDomain: Domain,
@@ -19,7 +20,7 @@ export class Flux extends Chart {
     constructor(scope: Construct, id: string, props: FluxProps) {
         super(scope, id, props);
 
-        new Include(this, 'dashboard', {
+        new Include(this, 'flux', {
             url: 'https://github.com/fluxcd/flux2/releases/download/v2.0.0-rc.1/install.yaml',
         });
 
@@ -30,12 +31,14 @@ export class Flux extends Chart {
             password
         });
 
-        new Ingress(this, props.registryDomain.fqdn, {
+        const registryIngress = new Ingress(this, props.registryDomain.fqdn, {
             rules: [{
                 host: props.registryDomain.fqdn,
                 backend: IngressBackend.fromService(registry.service)
             }]
         });
+
+        attachMiddlewares(registryIngress, [restrictToLocalNetwork(this)]);
 
         new KubeNetworkPolicy(this, 'allow-registry', {
             spec: {

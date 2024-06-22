@@ -93,6 +93,6 @@ export class Concourse extends Construct {
 
         // Euthanize the annoying PodDisruptionBudget that breaks `kubectl drain`
         const disruptionBudget = concourse.apiObjects.find(o => o.kind === 'PodDisruptionBudget');
-        disruptionBudget?.addJsonPatch(JsonPatch.replace('/spec/minAvailable', 0))
+        disruptionBudget?.addJsonPatch(JsonPatch.replace('/spec/minAvailable', 0));
     }
 }

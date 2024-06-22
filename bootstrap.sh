@@ -4,6 +4,10 @@
 yarn install --dev
 BOOTSTRAP=1 yarn synth
 
+# Reconfigure services in the system namespace
+kubectl apply -f dist/bootstrap/system.k8s.yaml
+kubectl rollout restart deployment/coredns
+
 # Apply the bootstrap manifests to deploy flux
 kubectl apply -f dist/bootstrap/flux.k8s.yaml
 

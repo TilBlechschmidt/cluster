@@ -4,6 +4,7 @@ import { Infra } from './chart/infra';
 import { Dev } from './chart/dev';
 import { Apps } from './chart/apps';
 import { Flux } from './chart/flux';
+import { KubeSystem } from './chart/kube-system';
 import { Testing } from './chart/testing';
 
 import { Domain } from './lib/infra/certManager';
@@ -11,6 +12,10 @@ import { Domain } from './lib/infra/certManager';
 class Bootstrap extends App {
     constructor(props: AppProps = {}) {
         super(props);
+
+        new KubeSystem(this, 'system', {
+            disableResourceNameHashes: true,
+        });
 
         new Flux(this, 'flux', {
             namespace: 'flux-system',
