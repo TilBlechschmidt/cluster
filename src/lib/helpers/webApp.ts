@@ -19,6 +19,7 @@ export interface WebAppProps {
 export class WebApp extends Construct {
     container: Container
     ingress: Ingress
+    service: Service
 
     constructor(scope: Construct, id: string, props: WebAppProps) {
         super(scope, id);
@@ -46,6 +47,8 @@ export class WebApp extends Construct {
             envVariables: obj2env(props.env || {}),
             resources: {},
         });
+
+        this.service = service;
 
         this.ingress = new Ingress(this, props.domain.fqdn, {
             rules: [{

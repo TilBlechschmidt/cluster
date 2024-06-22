@@ -22,6 +22,7 @@ import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
 import { Memos } from '../lib/app/memos';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
+import { Penpot } from '../lib/app/penpot';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -149,6 +150,11 @@ export class Apps extends Chart {
 
         const memos = new Memos(this, 'memos', {
             domain: registerDomain('memos.tibl.dev'),
+            oidc: props.infra.oidc
+        });
+
+        new Penpot(this, 'penpot', {
+            domain: props.infra.certManager.registerDomain('penpot.tibl.dev'),
             oidc: props.infra.oidc
         });
 
