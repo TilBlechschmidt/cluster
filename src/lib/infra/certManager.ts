@@ -58,7 +58,12 @@ export class CertManager extends Construct {
             version: "v1.11.1",
             repo: "https://charts.jetstack.io",
             values: {
-                installCRDs: true
+                installCRDs: true,
+                extraArgs: [
+                    '--dns01-recursive-nameservers="1.1.1.1:53"',
+                    '--dns01-recursive-nameservers="1.0.0.1:53"',
+                    '--dns01-recursive-nameservers-only'
+                ]
             }
         });
 
