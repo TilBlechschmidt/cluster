@@ -91,10 +91,10 @@ export class Authelia extends Construct {
 
                 user: `cn=${ldap.serviceAccount.id},${ldap.baseDN}`,
                 password: ldap.serviceAccountPassword,
-                
+
                 users_filter: '(&({username_attribute}={input})(objectClass=posixAccount))',
                 groups_filter: `(&(uniqueMember=cn={input},ou=login,ou=users,dc=tibl,dc=dev)(objectClass=posixGroup))`,
-                
+
                 username_attribute: 'cn',
                 display_name_attribute: 'displayName',
                 mail_attribute: 'mail',
@@ -113,7 +113,7 @@ export class Authelia extends Construct {
         });
 
         const secretBackend = new kplus.Secret(this, 'backend');
-        
+
         if (!useLDAP) {
             secretBackend.addStringData("users.yaml", yaml.dump({ users: props.backend.users }));
         }
@@ -161,7 +161,7 @@ export class Authelia extends Construct {
         container.mount("/data", createHostPathVolume(this, 'db'));
         container.mount("/secrets", kplus.Volume.fromSecret(this, 'mounted-secrets', secretKeys));
         container.mount("/config", kplus.Volume.fromConfigMap(this, 'mounted-config', configMap));
-        
+
         if (!useLDAP) {
             container.mount("/backend", kplus.Volume.fromSecret(this, 'mounted-backend', secretBackend));
         }
@@ -405,6 +405,11 @@ const DEFAULT_CONFIG = {
         }
     },
     "access_control": {
-        "default_policy": "two_factor"
+        "default_policy": "two_factor",
+        "rules": [{
+            domain: "home.tibl.dev",
+            policy: "one_factor",
+            subject: ["group:home"]
+        }]
     }
 };

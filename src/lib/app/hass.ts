@@ -3,7 +3,7 @@ import * as kplus from 'cdk8s-plus-26';
 
 import { Domain } from '../infra/certManager';
 import { createHostPathVolume, obj2env } from '../../helpers';
-import { Ingress, IngressBackend, Volume } from 'cdk8s-plus-26';
+import { Handler, Ingress, IngressBackend, Volume } from 'cdk8s-plus-26';
 
 export interface HomeAssistantProps {
     domain: Domain,
@@ -36,6 +36,9 @@ export class HomeAssistant extends Construct {
                 readOnlyRootFilesystem: false,
                 privileged: true,
                 allowPrivilegeEscalation: true
+            },
+            lifecycle: {
+                postStart: Handler.fromCommand(["apk", "add", "openldap-clients"])
             },
             resources: {}
         });
