@@ -24,6 +24,7 @@ import { Memos } from '../lib/app/memos';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 import { Penpot } from '../lib/app/penpot';
 import { OneTimeSecret } from '../lib/app/onetimesecret';
+import { HomeAssistant } from '../lib/app/hass';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -163,7 +164,11 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('onetimesecret.tibl.dev')
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos, scanTB, scanUB]) {
+        const hass = new HomeAssistant(this, 'hass', {
+            domain: props.infra.certManager.registerDomain('home.tibl.dev'),
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos, scanTB, scanUB, hass]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
