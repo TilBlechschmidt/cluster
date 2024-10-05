@@ -3,7 +3,7 @@ import * as kplus from 'cdk8s-plus-26';
 
 import { Domain } from '../infra/certManager';
 import { createHostPathVolume, obj2env } from '../../helpers';
-import { Handler, Ingress, IngressBackend, Volume } from 'cdk8s-plus-26';
+import { Handler, HostPathVolumeType, Ingress, IngressBackend, Volume } from 'cdk8s-plus-26';
 
 export interface HomeAssistantProps {
     domain: Domain,
@@ -52,5 +52,6 @@ export class HomeAssistant extends Construct {
 
         container.mount('/config', createHostPathVolume(this, 'config'));
         container.mount('/run/dbus', Volume.fromHostPath(this, 'dbus', 'dbus', { path: '/run/dbus' }), { readOnly: true });
+        container.mount('/dev/ttyUSB0', Volume.fromHostPath(this, 'zigbee', 'zigbee', { path: '/dev/ttyUSB0', type: HostPathVolumeType.CHAR_DEVICE }));
     }
 }
