@@ -61,6 +61,7 @@ export class Authelia extends Construct {
     domain: Domain;
 
     forwardAuth: MiddlewareIdentifier;
+    defaultPolicy?: 'two_factor' | 'one_factor';
 
     constructor(scope: Construct, id: string, props: AutheliaProps) {
         super(scope, id);
@@ -192,6 +193,7 @@ export class Authelia extends Construct {
         this.domain = props.domain;
         this.discoveryUrl = `https://${props.domain.fqdn}/.well-known/openid-configuration`;
         this.forwardAuth = forwardAuth;
+        this.defaultPolicy = props.config.defaultPolicy;
     }
 
     registerClient(id: string, props: ClientRegistrationProps, urlSafeSecret: boolean = false): string {
@@ -209,6 +211,7 @@ export class Authelia extends Construct {
             id,
             scopes,
             grant_types: ["refresh_token", "authorization_code"],
+            authorization_policy: this.defaultPolicy,
             ...secret,
             ...props
         };
