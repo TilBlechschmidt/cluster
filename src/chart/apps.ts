@@ -100,14 +100,9 @@ export class Apps extends Chart {
             hostPath: '/mnt/raid/Media/YouTube'
         });
 
-        const scanTB = new ScanServer(this, 'scanservtb', {
-            domain: registerDomain('scan-tibl.tibl.dev'),
-            webdav: secrets.webdav.tibl
-        });
-
-        const scanUB = new ScanServer(this, 'scanservub', {
-            domain: registerDomain('scan-ub.tibl.dev'),
-            webdav: secrets.webdav.ub
+        const scanServer = new ScanServer(this, 'scan', {
+            domain: registerDomain('scan.tibl.dev'),
+            users: secrets.scanServer
         });
 
         new Atuin(this, 'atuin', {
@@ -135,7 +130,7 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('home.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanTB, scanUB, hass]) {
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }

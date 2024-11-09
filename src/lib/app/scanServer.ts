@@ -3,19 +3,25 @@ import * as kplus from 'cdk8s-plus-26';
 
 import { Domain } from '../infra/certManager';
 import { Env, Ingress, IngressBackend, Secret } from 'cdk8s-plus-26';
-import { attachMiddlewares, restrictToLocalNetwork, stripPathPrefix } from '../../network';
 
 export interface ScanServerProps {
     readonly domain: Domain,
 
-    /// WebDAV configuration
-    readonly webdav: {
+    readonly users: { [user: string]: UserConfig },
+}
+
+export interface UserConfig {
+    readonly webdav?: {
         readonly url: string,
         readonly user: string,
         readonly pass: string
     }
 
-    readonly restrictToLocalNetwork?: boolean;
+    readonly paperless?: {
+        readonly url: string,
+        readonly token: string,
+        readonly customFields: { field: number, value: number }[],
+    }
 }
 
 export class ScanServer extends Construct {
@@ -25,9 +31,22 @@ export class ScanServer extends Construct {
         super(scope, id);
 
         const secret = new Secret(this, 'token');
-        secret.addStringData('WEBDAV_URL', props.webdav.url);
-        secret.addStringData('WEBDAV_USER', props.webdav.user);
-        secret.addStringData('WEBDAV_PASS', props.webdav.pass);
+
+        for (let user in props.users) {
+            const config = props.users[user];
+
+            if (config.webdav) {
+                secret.addStringData(`${user}_WEBDAV_URL`, config.webdav.url);
+                secret.addStringData(`${user}_WEBDAV_USER`, config.webdav.user);
+                secret.addStringData(`${user}_WEBDAV_PASS`, config.webdav.pass);
+            }
+
+            if (config.paperless) {
+                secret.addStringData(`${user}_PAPERLESS_URL`, config.paperless.url);
+                secret.addStringData(`${user}_PAPERLESS_TOKEN`, config.paperless.token);
+                secret.addStringData(`${user}_PAPERLESS_CUSTOM_FIELDS`, JSON.stringify(config.paperless.customFields));
+            }
+        }
 
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
@@ -42,7 +61,7 @@ export class ScanServer extends Construct {
                 group: 1000,
             },
             containers: [{
-                image: 'ghcr.io/tilblechschmidt/scan-server:sha-cb3b044',
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-e2f8e7b',
                 ports: [{ number: 3030 }],
                 envFrom: [Env.fromSecret(secret)],
                 resources: {}
@@ -56,10 +75,5 @@ export class ScanServer extends Construct {
                 backend: IngressBackend.fromService(service, { port: 80 })
             }]
         });
-
-        const middlewares = [];
-        if (props.restrictToLocalNetwork) middlewares.push(restrictToLocalNetwork(this));
-        if (props.domain.path) middlewares.push(stripPathPrefix(this, [props.domain.path]));
-        attachMiddlewares(this.ingress, middlewares);
     }
 }
