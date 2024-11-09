@@ -1,4 +1,5 @@
-import { Container, ContainerSecurityContextProps, Ingress, IngressBackend, Service, ServiceType, StatefulSet } from 'cdk8s-plus-26';
+import { Duration } from 'cdk8s';
+import { Container, ContainerSecurityContextProps, Ingress, IngressBackend, Probe, Service, ServiceType, StatefulSet } from 'cdk8s-plus-26';
 import { Construct } from 'constructs';
 import { obj2env } from '../../helpers';
 import { Domain } from '../infra/certManager';
@@ -46,6 +47,8 @@ export class WebApp extends Construct {
             securityContext,
             envVariables: obj2env(props.env || {}),
             resources: {},
+            // Give heavy apps a little more time to do startup things
+            startup: Probe.fromHttpGet('/', { initialDelaySeconds: Duration.seconds(10) })
         });
 
         this.service = service;
