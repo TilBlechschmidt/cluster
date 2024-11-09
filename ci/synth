@@ -2,19 +2,10 @@
 
 set -e -u
 
-echo "Hello world!"
-sleep 5
-echo "Continuing ..."
-
 cd cdk8s
+printf "%s" "$SECRETS" > secrets.json
 
-echo "Loading secrets ..."
-echo $SECRETS > secrets.json
-
-echo "Running install ..."
-yarn install --dev --no-progress -s
-
-echo "Running synth ..."
+yarn install --dev --no-progress
 yarn synth -s
 
 mv dist/cluster/* ../cluster/

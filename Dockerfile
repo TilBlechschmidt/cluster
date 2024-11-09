@@ -1,8 +1,17 @@
-FROM node:23.1.0-alpine3.19
+FROM node:23-bookworm
 
-RUN apk add --no-cache curl bash git
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | VERIFY_CHECKSUM=false bash
 
-RUN yarn global add cdk8s-cli@^2.2.29 ts-node@^10.9.1
+# Preinstall some heavy stuff so the actual pipeline runs a lil' faster
+RUN yarn global add cdk8s-cli@^2.2.43 ts-node@^10.9.1 argon2@^0.41.1
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/sh"]
