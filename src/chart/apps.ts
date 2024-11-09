@@ -119,21 +119,6 @@ export class Apps extends Chart {
             openRegistration: false
         });
 
-        const magicPack = new MagicPack(this, 'magicpack', {
-            domain: registerDomain('wake.tibl.dev'),
-            computers: {
-                SuprimPC: {
-                    name: "Suprim PC",
-                    computer: {
-                        location: "Bedroom",
-                        name: "DESKTOP-OHMSG0R",
-                        dns: "DESKTOP-OHMSG0R.fritz.box",
-                        mac: "A8:A1:59:51:3D:0A",
-                    }
-                }
-            }
-        });
-
         const jrnl = new Jrnl(this, 'jrnl', {
             domain: registerDomain('jrnl.tibl.dev'),
             oidc: props.infra.oidc,
@@ -168,7 +153,7 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('home.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, magicPack, jrnl, memos, scanTB, scanUB, hass]) {
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, memos, scanTB, scanUB, hass]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
