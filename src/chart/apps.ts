@@ -15,15 +15,11 @@ import { Jellyfin } from '../lib/app/jellyfin';
 import { ScanServer } from '../lib/app/scanServer';
 import { Atuin } from '../lib/app/atuin';
 import { TubeArchivist } from '../lib/app/tubeArchivist';
-import { MagicPack } from '../lib/app/magicpack';
 import { Jrnl } from '../lib/app/jrnl';
 import { HedgeDoc } from '../lib/app/hedgedoc';
 import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
-import { Memos } from '../lib/app/memos';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
-import { Penpot } from '../lib/app/penpot';
-import { OneTimeSecret } from '../lib/app/onetimesecret';
 import { HomeAssistant } from '../lib/app/hass';
 
 export interface AppsProps extends ChartProps {
@@ -135,25 +131,11 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        const memos = new Memos(this, 'memos', {
-            domain: registerDomain('memos.tibl.dev'),
-            oidc: props.infra.oidc
-        });
-
-        new Penpot(this, 'penpot', {
-            domain: props.infra.certManager.registerDomain('penpot.tibl.dev'),
-            oidc: props.infra.oidc
-        });
-
-        new OneTimeSecret(this, 'ots', {
-            domain: props.infra.certManager.registerDomain('onetimesecret.tibl.dev')
-        });
-
         const hass = new HomeAssistant(this, 'hass', {
             domain: props.infra.certManager.registerDomain('home.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, memos, scanTB, scanUB, hass]) {
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanTB, scanUB, hass]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
