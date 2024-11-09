@@ -20,7 +20,7 @@ export class BuildKitDaemon extends Construct {
             },
             containers: [{
                 name: 'buildkit',
-                image: 'moby/buildkit:master-rootless',
+                image: 'moby/buildkit:v0.17.0-rootless',
                 portNumber: 1234,
                 args: [
                     '--oci-worker-no-process-sandbox',
