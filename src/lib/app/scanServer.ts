@@ -63,7 +63,7 @@ export class ScanServer extends Construct {
                 group: 1000,
             },
             containers: [{
-                image: 'ghcr.io/tilblechschmidt/scan-server:sha-e2f8e7b',
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-d7c6e57',
                 ports: [{ number: 3030 }],
                 envFrom: [Env.fromSecret(secret)],
                 resources: {}
