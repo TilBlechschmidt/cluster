@@ -48,7 +48,7 @@ export class WebApp extends Construct {
             envVariables: obj2env(props.env || {}),
             resources: {},
             // Give heavy apps a little more time to do startup things
-            startup: Probe.fromHttpGet('/', { initialDelaySeconds: Duration.seconds(10) })
+            startup: Probe.fromTcpSocket({ initialDelaySeconds: Duration.seconds(10) })
         });
 
         this.service = service;
