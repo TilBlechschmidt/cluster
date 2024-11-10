@@ -31,9 +31,11 @@ export class ScanServer extends Construct {
         super(scope, id);
 
         const secret = new Secret(this, 'token');
+        secret.addStringData('SCAN_USERS', Object.keys(props.users).join(','));
 
         for (let user in props.users) {
             const config = props.users[user];
+            user = user.toUpperCase();
 
             if (config.webdav) {
                 secret.addStringData(`${user}_WEBDAV_URL`, config.webdav.url);
