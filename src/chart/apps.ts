@@ -21,6 +21,7 @@ import { SeaFile } from '../lib/app/seafile';
 import { AudioBookShelf } from '../lib/app/audiobookshelf';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 import { HomeAssistant } from '../lib/app/hass';
+import { Paperless } from '../lib/app/paperless';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -130,7 +131,12 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('home.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass]) {
+        const paperless = new Paperless(this, 'paperless', {
+            domain: props.infra.certManager.registerDomain('paper.tibl.dev'),
+            oidc: props.infra.oidc
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
