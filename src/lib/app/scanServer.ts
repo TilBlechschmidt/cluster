@@ -30,8 +30,9 @@ export class ScanServer extends Construct {
     constructor(scope: Construct, id: string, props: ScanServerProps) {
         super(scope, id);
 
-        const secret = new Secret(this, 'token');
+        const secret = new Secret(this, 'config');
         secret.addStringData('SCAN_USERS', Object.keys(props.users).join(','));
+        secret.addStringData('RUST_LOG', 'info,h2=warn,hyper=warn,rustls=warn');
 
         for (let user in props.users) {
             const config = props.users[user];
@@ -63,7 +64,7 @@ export class ScanServer extends Construct {
                 group: 1000,
             },
             containers: [{
-                image: 'ghcr.io/tilblechschmidt/scan-server:sha-d7c6e57',
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-c34ed3c',
                 ports: [{ number: 3030 }],
                 envFrom: [Env.fromSecret(secret)],
                 resources: {}
