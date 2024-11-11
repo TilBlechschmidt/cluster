@@ -50,6 +50,9 @@ export class Paperless extends WebApp {
 
                 PAPERLESS_TIKA_ENABLED: "1",
 
+                PAPERLESS_TASK_WORKERS: "3",
+                PAPERLESS_THREADS_PER_WORKER: "4",
+
                 PAPERLESS_TIME_ZONE: 'Europe/Berlin',
                 PAPERLESS_OCR_LANGUAGE: 'deu',
 
