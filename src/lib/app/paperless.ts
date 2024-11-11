@@ -54,7 +54,9 @@ export class Paperless extends WebApp {
                 PAPERLESS_THREADS_PER_WORKER: "4",
 
                 PAPERLESS_TIME_ZONE: 'Europe/Berlin',
+
                 PAPERLESS_OCR_LANGUAGE: 'deu',
+                PAPERLESS_OCR_DESKEW: '0',
 
                 PAPERLESS_FILENAME_FORMAT: '{{ created_year }}/{{ correspondent }}/{{ created }} {{ asn }}',
                 PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: '1',
