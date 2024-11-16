@@ -9,9 +9,6 @@ import { CertManager } from '../lib/infra/certManager';
 import { Librespeed } from '../lib/infra/librespeed';
 
 import secrets from '../../secrets.json';
-import { Influx } from '../lib/helpers/db/influxdb';
-import { generateSecret } from '../helpers';
-import { Grafana } from '../lib/infra/grafana';
 import { GlAuth } from '../lib/infra/glauth';
 import { PiHole } from '../lib/infra/pihole';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
@@ -66,21 +63,6 @@ export class Infra extends Chart {
             oidc: this.oidc
         });
 
-        new Influx(this, 'influx', {
-            user: 'admin',
-            password: generateSecret('infra-influx', 32),
-            bucket: 'monitoring',
-            org: 'main',
-            token: generateSecret('infra-influx-token', 32),
-            retention: '4w',
-            nodePort: 1202
-        });
-
-        const grafana = new Grafana(this, 'grafana', {
-            domain: this.certManager.registerDomain('grafana.tibl.dev'),
-            oidc: this.oidc
-        });
-
         new Librespeed(this, 'librespeed', {
             domain: this.certManager.registerDomain('speed.tibl.dev')
         });
@@ -106,7 +88,7 @@ export class Infra extends Chart {
             wildcardExclusions: ['backup.tibl.dev']
         });
 
-        for (const app of [grafana, piHole]) {
+        for (const app of [piHole]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
