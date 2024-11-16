@@ -70,6 +70,13 @@ export class Paperless extends WebApp {
                 PAPERLESS_NUMBER_OF_SUGGESTED_DATES: '5',
                 PAPERLESS_IGNORE_DATES: '28.02.1998',
 
+                // If the Linux I/O subsystem is blocked by e.g. HDDs spinning up, access to the DB might take
+                // a few seconds longer than one would like. Django really does not like this and that combined
+                // with parallel uploads that try to concurrently modify the database would fail.
+                //
+                // More of a safeguard to make sure errors do not happen rather than something actually necessary ...
+                PAPERLESS_DB_TIMEOUT: '60',
+
                 USERMAP_UID: "1000",
                 USERMAP_GID: "3000",
             }
