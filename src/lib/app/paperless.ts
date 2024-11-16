@@ -63,6 +63,7 @@ export class Paperless extends WebApp {
 
                 PAPERLESS_CONSUMER_ENABLE_BARCODES: '1',
                 PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE: '1',
+                PAPERLESS_CONSUMER_BARCODE_SCANNER: 'ZXING',
 
                 PAPERLESS_CONSUMER_BARCODE_UPSCALE: '2.0',
                 PAPERLESS_CONSUMER_BARCODE_DPI: '600',
