@@ -22,6 +22,11 @@ export interface UserConfig {
         readonly token: string,
         readonly customFields: { field: number, value: number }[],
     }
+
+    readonly telegram?: {
+        readonly token: string,
+        readonly chat: string,
+    }
 }
 
 export class ScanServer extends Construct {
@@ -49,6 +54,11 @@ export class ScanServer extends Construct {
                 secret.addStringData(`${user}_PAPERLESS_TOKEN`, config.paperless.token);
                 secret.addStringData(`${user}_PAPERLESS_CUSTOM_FIELDS`, JSON.stringify(config.paperless.customFields));
             }
+
+            if (config.telegram) {
+                secret.addStringData(`${user}_TELEGRAM_TOKEN`, config.telegram.token);
+                secret.addStringData(`${user}_TELEGRAM_CHAT`, config.telegram.chat);
+            }
         }
 
         const service = new kplus.Service(this, id, {
@@ -64,7 +74,7 @@ export class ScanServer extends Construct {
                 group: 1000,
             },
             containers: [{
-                image: 'ghcr.io/tilblechschmidt/scan-server:sha-c34ed3c',
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-8f1714d',
                 ports: [{ number: 3030 }],
                 envFrom: [Env.fromSecret(secret)],
                 resources: {}
