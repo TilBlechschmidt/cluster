@@ -58,7 +58,7 @@ export class Paperless extends WebApp {
                 PAPERLESS_OCR_LANGUAGE: 'deu',
                 PAPERLESS_OCR_DESKEW: '0',
 
-                PAPERLESS_FILENAME_FORMAT: '{{ created_year }}/{{ correspondent }}/{{ created }} {{ asn }}',
+                PAPERLESS_FILENAME_FORMAT: '{{ created_year }}/{{ correspondent }}/{{ created }} {{ title }}',
                 PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: '1',
 
                 PAPERLESS_CONSUMER_ENABLE_BARCODES: '1',
@@ -84,9 +84,6 @@ export class Paperless extends WebApp {
 
         // Internal data path for SQLite, indices, ML models and so on
         this.container.mount('/usr/src/paperless/data', createHostPathVolume(this, `data`));
-
-        // No clue what this is for :D
-        this.container.mount('/usr/src/paperless/export', createHostPathVolume(this, `export`));
 
         // Add a second ingress for the share path which should not be restricted to the local network
         new Ingress(this, 'share', {
