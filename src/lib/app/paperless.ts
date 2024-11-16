@@ -67,6 +67,9 @@ export class Paperless extends WebApp {
                 PAPERLESS_CONSUMER_BARCODE_UPSCALE: '2.0',
                 PAPERLESS_CONSUMER_BARCODE_DPI: '600',
 
+                PAPERLESS_NUMBER_OF_SUGGESTED_DATES: '5',
+                PAPERLESS_IGNORE_DATES: '28.02.1998',
+
                 USERMAP_UID: "1000",
                 USERMAP_GID: "3000",
             }
