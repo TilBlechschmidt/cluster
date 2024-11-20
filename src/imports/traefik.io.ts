@@ -13,7 +13,7 @@ export class IngressRoute extends ApiObject {
    * Returns the apiVersion and kind for "IngressRoute"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'IngressRoute',
   }
 
@@ -727,7 +727,7 @@ export class IngressRouteTcp extends ApiObject {
    * Returns the apiVersion and kind for "IngressRouteTCP"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'IngressRouteTCP',
   }
 
@@ -1281,7 +1281,7 @@ export class IngressRouteUdp extends ApiObject {
    * Returns the apiVersion and kind for "IngressRouteUDP"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'IngressRouteUDP',
   }
 
@@ -1523,7 +1523,7 @@ export class Middleware extends ApiObject {
    * Returns the apiVersion and kind for "Middleware"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'Middleware',
   }
 
@@ -4099,7 +4099,7 @@ export class MiddlewareTcp extends ApiObject {
    * Returns the apiVersion and kind for "MiddlewareTCP"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'MiddlewareTCP',
   }
 
@@ -4336,7 +4336,7 @@ export class ServersTransport extends ApiObject {
    * Returns the apiVersion and kind for "ServersTransport"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'ServersTransport',
   }
 
@@ -4656,7 +4656,7 @@ export class TlsOption extends ApiObject {
    * Returns the apiVersion and kind for "TLSOption"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'TLSOption',
   }
 
@@ -4899,7 +4899,7 @@ export class TlsStore extends ApiObject {
    * Returns the apiVersion and kind for "TLSStore"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'TLSStore',
   }
 
@@ -5173,7 +5173,7 @@ export class TraefikService extends ApiObject {
    * Returns the apiVersion and kind for "TraefikService"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'traefik.containo.us/v1alpha1',
+    apiVersion: 'traefik.io/v1alpha1',
     kind: 'TraefikService',
   }
 
