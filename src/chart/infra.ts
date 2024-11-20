@@ -12,6 +12,7 @@ import secrets from '../../secrets.json';
 import { GlAuth } from '../lib/infra/glauth';
 import { PiHole } from '../lib/infra/pihole';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
+import { Traefik } from '../lib/infra/traefik';
 
 export class Infra extends Chart {
     certManager: CertManager;
@@ -22,6 +23,8 @@ export class Infra extends Chart {
         super(scope, id, props);
 
         new Namespace(this, id);
+
+        new Traefik(this, 'traefik');
 
         this.certManager = new CertManager(this, 'cert-manager', {
             cloudflareAccountKey: secrets.certManager.cloudflareAccountKey,

@@ -101,7 +101,7 @@ export interface IngressRouteSpec {
   /**
    * EntryPoints defines the list of entry point names to bind to.
    * Entry points have to be configured in the static configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/entrypoints/
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/entrypoints/
    * Default: all.
    *
    * @schema IngressRouteSpec#entryPoints
@@ -117,7 +117,7 @@ export interface IngressRouteSpec {
 
   /**
    * TLS defines the TLS configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#tls
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#tls
    *
    * @schema IngressRouteSpec#tls
    */
@@ -157,7 +157,7 @@ export interface IngressRouteSpecRoutes {
 
   /**
    * Match defines the router's rule.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#rule
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#rule
    *
    * @schema IngressRouteSpecRoutes#match
    */
@@ -165,7 +165,7 @@ export interface IngressRouteSpecRoutes {
 
   /**
    * Middlewares defines the list of references to Middleware resources.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-middleware
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-middleware
    *
    * @schema IngressRouteSpecRoutes#middlewares
    */
@@ -173,7 +173,7 @@ export interface IngressRouteSpecRoutes {
 
   /**
    * Priority defines the router's priority.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#priority
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#priority
    *
    * @schema IngressRouteSpecRoutes#priority
    */
@@ -186,6 +186,14 @@ export interface IngressRouteSpecRoutes {
    * @schema IngressRouteSpecRoutes#services
    */
   readonly services?: IngressRouteSpecRoutesServices[];
+
+  /**
+   * Syntax defines the router's rule syntax.
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#rulesyntax
+   *
+   * @schema IngressRouteSpecRoutes#syntax
+   */
+  readonly syntax?: string;
 
 }
 
@@ -201,6 +209,7 @@ export function toJson_IngressRouteSpecRoutes(obj: IngressRouteSpecRoutes | unde
     'middlewares': obj.middlewares?.map(y => toJson_IngressRouteSpecRoutesMiddlewares(y)),
     'priority': obj.priority,
     'services': obj.services?.map(y => toJson_IngressRouteSpecRoutesServices(y)),
+    'syntax': obj.syntax,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -209,7 +218,7 @@ export function toJson_IngressRouteSpecRoutes(obj: IngressRouteSpecRoutes | unde
 
 /**
  * TLS defines the TLS configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#tls
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#tls
  *
  * @schema IngressRouteSpecTls
  */
@@ -217,7 +226,7 @@ export interface IngressRouteSpecTls {
   /**
    * CertResolver defines the name of the certificate resolver to use.
    * Cert resolvers have to be configured in the static configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/acme/#certificate-resolvers
+   * More info: https://doc.traefik.io/traefik/v3.2/https/acme/#certificate-resolvers
    *
    * @schema IngressRouteSpecTls#certResolver
    */
@@ -225,7 +234,7 @@ export interface IngressRouteSpecTls {
 
   /**
    * Domains defines the list of domains that will be used to issue certificates.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#domains
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#domains
    *
    * @schema IngressRouteSpecTls#domains
    */
@@ -234,7 +243,7 @@ export interface IngressRouteSpecTls {
   /**
    * Options defines the reference to a TLSOption, that specifies the parameters of the TLS connection.
    * If not defined, the `default` TLSOption is used.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+   * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
    *
    * @schema IngressRouteSpecTls#options
    */
@@ -330,6 +339,13 @@ export function toJson_IngressRouteSpecRoutesMiddlewares(obj: IngressRouteSpecRo
  */
 export interface IngressRouteSpecRoutesServices {
   /**
+   * Healthcheck defines health checks for ExternalName services.
+   *
+   * @schema IngressRouteSpecRoutesServices#healthCheck
+   */
+  readonly healthCheck?: IngressRouteSpecRoutesServicesHealthCheck;
+
+  /**
    * Kind defines the kind of the Service.
    *
    * @schema IngressRouteSpecRoutesServices#kind
@@ -360,6 +376,16 @@ export interface IngressRouteSpecRoutesServices {
    * @schema IngressRouteSpecRoutesServices#nativeLB
    */
   readonly nativeLb?: boolean;
+
+  /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema IngressRouteSpecRoutesServices#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
 
   /**
    * PassHostHeader defines whether the client Host header is forwarded to the upstream Kubernetes Service.
@@ -403,7 +429,7 @@ export interface IngressRouteSpecRoutesServices {
 
   /**
    * Sticky defines the sticky sessions configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
    *
    * @schema IngressRouteSpecRoutesServices#sticky
    */
@@ -434,10 +460,12 @@ export interface IngressRouteSpecRoutesServices {
 export function toJson_IngressRouteSpecRoutesServices(obj: IngressRouteSpecRoutesServices | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'healthCheck': toJson_IngressRouteSpecRoutesServicesHealthCheck(obj.healthCheck),
     'kind': obj.kind,
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'passHostHeader': obj.passHostHeader,
     'port': obj.port?.value,
     'responseForwarding': toJson_IngressRouteSpecRoutesServicesResponseForwarding(obj.responseForwarding),
@@ -492,14 +520,14 @@ export function toJson_IngressRouteSpecTlsDomains(obj: IngressRouteSpecTlsDomain
 /**
  * Options defines the reference to a TLSOption, that specifies the parameters of the TLS connection.
  * If not defined, the `default` TLSOption is used.
- * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+ * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
  *
  * @schema IngressRouteSpecTlsOptions
  */
 export interface IngressRouteSpecTlsOptions {
   /**
    * Name defines the name of the referenced TLSOption.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-tlsoption
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-tlsoption
    *
    * @schema IngressRouteSpecTlsOptions#name
    */
@@ -507,7 +535,7 @@ export interface IngressRouteSpecTlsOptions {
 
   /**
    * Namespace defines the namespace of the referenced TLSOption.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-tlsoption
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-tlsoption
    *
    * @schema IngressRouteSpecTlsOptions#namespace
    */
@@ -539,7 +567,7 @@ export function toJson_IngressRouteSpecTlsOptions(obj: IngressRouteSpecTlsOption
 export interface IngressRouteSpecTlsStore {
   /**
    * Name defines the name of the referenced TLSStore.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-tlsstore
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-tlsstore
    *
    * @schema IngressRouteSpecTlsStore#name
    */
@@ -547,7 +575,7 @@ export interface IngressRouteSpecTlsStore {
 
   /**
    * Namespace defines the namespace of the referenced TLSStore.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-tlsstore
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-tlsstore
    *
    * @schema IngressRouteSpecTlsStore#namespace
    */
@@ -564,6 +592,120 @@ export function toJson_IngressRouteSpecTlsStore(obj: IngressRouteSpecTlsStore | 
   const result = {
     'name': obj.name,
     'namespace': obj.namespace,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Healthcheck defines health checks for ExternalName services.
+ *
+ * @schema IngressRouteSpecRoutesServicesHealthCheck
+ */
+export interface IngressRouteSpecRoutesServicesHealthCheck {
+  /**
+   * FollowRedirects defines whether redirects should be followed during the health check calls.
+   * Default: true
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#followRedirects
+   */
+  readonly followRedirects?: boolean;
+
+  /**
+   * Headers defines custom headers to be sent to the health check endpoint.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#headers
+   */
+  readonly headers?: { [key: string]: string };
+
+  /**
+   * Hostname defines the value of hostname in the Host header of the health check request.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#hostname
+   */
+  readonly hostname?: string;
+
+  /**
+   * Interval defines the frequency of the health check calls.
+   * Default: 30s
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#interval
+   */
+  readonly interval?: IngressRouteSpecRoutesServicesHealthCheckInterval;
+
+  /**
+   * Method defines the healthcheck method.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#method
+   */
+  readonly method?: string;
+
+  /**
+   * Mode defines the health check mode.
+   * If defined to grpc, will use the gRPC health check protocol to probe the server.
+   * Default: http
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#mode
+   */
+  readonly mode?: string;
+
+  /**
+   * Path defines the server URL path for the health check endpoint.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#path
+   */
+  readonly path?: string;
+
+  /**
+   * Port defines the server URL port for the health check endpoint.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#port
+   */
+  readonly port?: number;
+
+  /**
+   * Scheme replaces the server URL scheme for the health check endpoint.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#scheme
+   */
+  readonly scheme?: string;
+
+  /**
+   * Status defines the expected HTTP status code of the response to the health check request.
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#status
+   */
+  readonly status?: number;
+
+  /**
+   * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+   * Default: 5s
+   *
+   * @schema IngressRouteSpecRoutesServicesHealthCheck#timeout
+   */
+  readonly timeout?: IngressRouteSpecRoutesServicesHealthCheckTimeout;
+
+}
+
+/**
+ * Converts an object of type 'IngressRouteSpecRoutesServicesHealthCheck' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_IngressRouteSpecRoutesServicesHealthCheck(obj: IngressRouteSpecRoutesServicesHealthCheck | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'followRedirects': obj.followRedirects,
+    'headers': ((obj.headers) === undefined) ? undefined : (Object.entries(obj.headers).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'hostname': obj.hostname,
+    'interval': obj.interval?.value,
+    'method': obj.method,
+    'mode': obj.mode,
+    'path': obj.path,
+    'port': obj.port,
+    'scheme': obj.scheme,
+    'status': obj.status,
+    'timeout': obj.timeout?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -634,7 +776,7 @@ export function toJson_IngressRouteSpecRoutesServicesResponseForwarding(obj: Ing
 
 /**
  * Sticky defines the sticky sessions configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
  *
  * @schema IngressRouteSpecRoutesServicesSticky
  */
@@ -663,6 +805,40 @@ export function toJson_IngressRouteSpecRoutesServicesSticky(obj: IngressRouteSpe
 /* eslint-enable max-len, quote-props */
 
 /**
+ * Interval defines the frequency of the health check calls.
+ * Default: 30s
+ *
+ * @schema IngressRouteSpecRoutesServicesHealthCheckInterval
+ */
+export class IngressRouteSpecRoutesServicesHealthCheckInterval {
+  public static fromNumber(value: number): IngressRouteSpecRoutesServicesHealthCheckInterval {
+    return new IngressRouteSpecRoutesServicesHealthCheckInterval(value);
+  }
+  public static fromString(value: string): IngressRouteSpecRoutesServicesHealthCheckInterval {
+    return new IngressRouteSpecRoutesServicesHealthCheckInterval(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+ * Default: 5s
+ *
+ * @schema IngressRouteSpecRoutesServicesHealthCheckTimeout
+ */
+export class IngressRouteSpecRoutesServicesHealthCheckTimeout {
+  public static fromNumber(value: number): IngressRouteSpecRoutesServicesHealthCheckTimeout {
+    return new IngressRouteSpecRoutesServicesHealthCheckTimeout(value);
+  }
+  public static fromString(value: string): IngressRouteSpecRoutesServicesHealthCheckTimeout {
+    return new IngressRouteSpecRoutesServicesHealthCheckTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
  * Cookie defines the sticky cookie configuration.
  *
  * @schema IngressRouteSpecRoutesServicesStickyCookie
@@ -674,6 +850,15 @@ export interface IngressRouteSpecRoutesServicesStickyCookie {
    * @schema IngressRouteSpecRoutesServicesStickyCookie#httpOnly
    */
   readonly httpOnly?: boolean;
+
+  /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema IngressRouteSpecRoutesServicesStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
 
   /**
    * Name defines the Cookie name.
@@ -707,6 +892,7 @@ export function toJson_IngressRouteSpecRoutesServicesStickyCookie(obj: IngressRo
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,
@@ -815,7 +1001,7 @@ export interface IngressRouteTcpSpec {
   /**
    * EntryPoints defines the list of entry point names to bind to.
    * Entry points have to be configured in the static configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/entrypoints/
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/entrypoints/
    * Default: all.
    *
    * @schema IngressRouteTcpSpec#entryPoints
@@ -831,7 +1017,7 @@ export interface IngressRouteTcpSpec {
 
   /**
    * TLS defines the TLS configuration on a layer 4 / TCP Route.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#tls_1
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#tls_1
    *
    * @schema IngressRouteTcpSpec#tls
    */
@@ -863,7 +1049,7 @@ export function toJson_IngressRouteTcpSpec(obj: IngressRouteTcpSpec | undefined)
 export interface IngressRouteTcpSpecRoutes {
   /**
    * Match defines the router's rule.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#rule_1
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#rule_1
    *
    * @schema IngressRouteTcpSpecRoutes#match
    */
@@ -878,7 +1064,7 @@ export interface IngressRouteTcpSpecRoutes {
 
   /**
    * Priority defines the router's priority.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#priority_1
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#priority_1
    *
    * @schema IngressRouteTcpSpecRoutes#priority
    */
@@ -890,6 +1076,14 @@ export interface IngressRouteTcpSpecRoutes {
    * @schema IngressRouteTcpSpecRoutes#services
    */
   readonly services?: IngressRouteTcpSpecRoutesServices[];
+
+  /**
+   * Syntax defines the router's rule syntax.
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#rulesyntax_1
+   *
+   * @schema IngressRouteTcpSpecRoutes#syntax
+   */
+  readonly syntax?: string;
 
 }
 
@@ -904,6 +1098,7 @@ export function toJson_IngressRouteTcpSpecRoutes(obj: IngressRouteTcpSpecRoutes 
     'middlewares': obj.middlewares?.map(y => toJson_IngressRouteTcpSpecRoutesMiddlewares(y)),
     'priority': obj.priority,
     'services': obj.services?.map(y => toJson_IngressRouteTcpSpecRoutesServices(y)),
+    'syntax': obj.syntax,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -912,7 +1107,7 @@ export function toJson_IngressRouteTcpSpecRoutes(obj: IngressRouteTcpSpecRoutes 
 
 /**
  * TLS defines the TLS configuration on a layer 4 / TCP Route.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#tls_1
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#tls_1
  *
  * @schema IngressRouteTcpSpecTls
  */
@@ -920,7 +1115,7 @@ export interface IngressRouteTcpSpecTls {
   /**
    * CertResolver defines the name of the certificate resolver to use.
    * Cert resolvers have to be configured in the static configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/acme/#certificate-resolvers
+   * More info: https://doc.traefik.io/traefik/v3.2/https/acme/#certificate-resolvers
    *
    * @schema IngressRouteTcpSpecTls#certResolver
    */
@@ -928,7 +1123,7 @@ export interface IngressRouteTcpSpecTls {
 
   /**
    * Domains defines the list of domains that will be used to issue certificates.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/routers/#domains
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/routers/#domains
    *
    * @schema IngressRouteTcpSpecTls#domains
    */
@@ -937,7 +1132,7 @@ export interface IngressRouteTcpSpecTls {
   /**
    * Options defines the reference to a TLSOption, that specifies the parameters of the TLS connection.
    * If not defined, the `default` TLSOption is used.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+   * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
    *
    * @schema IngressRouteTcpSpecTls#options
    */
@@ -1054,6 +1249,16 @@ export interface IngressRouteTcpSpecRoutesServices {
   readonly nativeLb?: boolean;
 
   /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema IngressRouteTcpSpecRoutesServices#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
+
+  /**
    * Port defines the port of a Kubernetes Service.
    * This can be a reference to a named port.
    *
@@ -1063,11 +1268,20 @@ export interface IngressRouteTcpSpecRoutesServices {
 
   /**
    * ProxyProtocol defines the PROXY protocol configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#proxy-protocol
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#proxy-protocol
    *
    * @schema IngressRouteTcpSpecRoutesServices#proxyProtocol
    */
   readonly proxyProtocol?: IngressRouteTcpSpecRoutesServicesProxyProtocol;
+
+  /**
+   * ServersTransport defines the name of ServersTransportTCP resource to use.
+   * It allows to configure the transport between Traefik and your servers.
+   * Can only be used on a Kubernetes Service.
+   *
+   * @schema IngressRouteTcpSpecRoutesServices#serversTransport
+   */
+  readonly serversTransport?: string;
 
   /**
    * TerminationDelay defines the deadline that the proxy sets, after one of its connected peers indicates
@@ -1075,10 +1289,18 @@ export interface IngressRouteTcpSpecRoutesServices {
    * hence fully terminating the connection.
    * It is a duration in milliseconds, defaulting to 100.
    * A negative value means an infinite deadline (i.e. the reading capability is never closed).
+   * Deprecated: TerminationDelay will not be supported in future APIVersions, please use ServersTransport to configure the TerminationDelay instead.
    *
    * @schema IngressRouteTcpSpecRoutesServices#terminationDelay
    */
   readonly terminationDelay?: number;
+
+  /**
+   * TLS determines whether to use TLS when dialing with the backend.
+   *
+   * @schema IngressRouteTcpSpecRoutesServices#tls
+   */
+  readonly tls?: boolean;
 
   /**
    * Weight defines the weight used when balancing requests between multiple Kubernetes Service.
@@ -1099,9 +1321,12 @@ export function toJson_IngressRouteTcpSpecRoutesServices(obj: IngressRouteTcpSpe
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'port': obj.port?.value,
     'proxyProtocol': toJson_IngressRouteTcpSpecRoutesServicesProxyProtocol(obj.proxyProtocol),
+    'serversTransport': obj.serversTransport,
     'terminationDelay': obj.terminationDelay,
+    'tls': obj.tls,
     'weight': obj.weight,
   };
   // filter undefined values
@@ -1149,7 +1374,7 @@ export function toJson_IngressRouteTcpSpecTlsDomains(obj: IngressRouteTcpSpecTls
 /**
  * Options defines the reference to a TLSOption, that specifies the parameters of the TLS connection.
  * If not defined, the `default` TLSOption is used.
- * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+ * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
  *
  * @schema IngressRouteTcpSpecTlsOptions
  */
@@ -1242,7 +1467,7 @@ export class IngressRouteTcpSpecRoutesServicesPort {
 
 /**
  * ProxyProtocol defines the PROXY protocol configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#proxy-protocol
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#proxy-protocol
  *
  * @schema IngressRouteTcpSpecRoutesServicesProxyProtocol
  */
@@ -1369,7 +1594,7 @@ export interface IngressRouteUdpSpec {
   /**
    * EntryPoints defines the list of entry point names to bind to.
    * Entry points have to be configured in the static configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/entrypoints/
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/entrypoints/
    * Default: all.
    *
    * @schema IngressRouteUdpSpec#entryPoints
@@ -1460,6 +1685,16 @@ export interface IngressRouteUdpSpecRoutesServices {
   readonly nativeLb?: boolean;
 
   /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema IngressRouteUdpSpecRoutesServices#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
+
+  /**
    * Port defines the port of a Kubernetes Service.
    * This can be a reference to a named port.
    *
@@ -1486,6 +1721,7 @@ export function toJson_IngressRouteUdpSpecRoutesServices(obj: IngressRouteUdpSpe
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'port': obj.port?.value,
     'weight': obj.weight,
   };
@@ -1514,7 +1750,7 @@ export class IngressRouteUdpSpecRoutesServicesPort {
 
 /**
  * Middleware is the CRD implementation of a Traefik Middleware.
-More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/overview/
+More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/overview/
  *
  * @schema Middleware
  */
@@ -1569,7 +1805,7 @@ export class Middleware extends ApiObject {
 
 /**
  * Middleware is the CRD implementation of a Traefik Middleware.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/overview/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/overview/
  *
  * @schema Middleware
  */
@@ -1612,7 +1848,7 @@ export interface MiddlewareSpec {
   /**
    * AddPrefix holds the add prefix middleware configuration.
    * This middleware updates the path of a request before forwarding it.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/addprefix/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/addprefix/
    *
    * @schema MiddlewareSpec#addPrefix
    */
@@ -1621,7 +1857,7 @@ export interface MiddlewareSpec {
   /**
    * BasicAuth holds the basic auth middleware configuration.
    * This middleware restricts access to your services to known users.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/basicauth/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/basicauth/
    *
    * @schema MiddlewareSpec#basicAuth
    */
@@ -1630,7 +1866,7 @@ export interface MiddlewareSpec {
   /**
    * Buffering holds the buffering middleware configuration.
    * This middleware retries or limits the size of requests that can be forwarded to backends.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/buffering/#maxrequestbodybytes
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/buffering/#maxrequestbodybytes
    *
    * @schema MiddlewareSpec#buffering
    */
@@ -1639,7 +1875,7 @@ export interface MiddlewareSpec {
   /**
    * Chain holds the configuration of the chain middleware.
    * This middleware enables to define reusable combinations of other pieces of middleware.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/chain/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/chain/
    *
    * @schema MiddlewareSpec#chain
    */
@@ -1654,8 +1890,8 @@ export interface MiddlewareSpec {
 
   /**
    * Compress holds the compress middleware configuration.
-   * This middleware compresses responses before sending them to the client, using gzip compression.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/compress/
+   * This middleware compresses responses before sending them to the client, using gzip, brotli, or zstd compression.
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/compress/
    *
    * @schema MiddlewareSpec#compress
    */
@@ -1672,7 +1908,7 @@ export interface MiddlewareSpec {
   /**
    * DigestAuth holds the digest auth middleware configuration.
    * This middleware restricts access to your services to known users.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/digestauth/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/digestauth/
    *
    * @schema MiddlewareSpec#digestAuth
    */
@@ -1681,7 +1917,7 @@ export interface MiddlewareSpec {
   /**
    * ErrorPage holds the custom error middleware configuration.
    * This middleware returns a custom page in lieu of the default, according to configured ranges of HTTP Status codes.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/errorpages/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/errorpages/
    *
    * @schema MiddlewareSpec#errors
    */
@@ -1690,16 +1926,24 @@ export interface MiddlewareSpec {
   /**
    * ForwardAuth holds the forward auth middleware configuration.
    * This middleware delegates the request authentication to a Service.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/forwardauth/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/forwardauth/
    *
    * @schema MiddlewareSpec#forwardAuth
    */
   readonly forwardAuth?: MiddlewareSpecForwardAuth;
 
   /**
+   * GrpcWeb holds the gRPC web middleware configuration.
+   * This middleware converts a gRPC web request to an HTTP/2 gRPC request.
+   *
+   * @schema MiddlewareSpec#grpcWeb
+   */
+  readonly grpcWeb?: MiddlewareSpecGrpcWeb;
+
+  /**
    * Headers holds the headers middleware configuration.
    * This middleware manages the requests and responses headers.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/headers/#customrequestheaders
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/headers/#customrequestheaders
    *
    * @schema MiddlewareSpec#headers
    */
@@ -1708,7 +1952,7 @@ export interface MiddlewareSpec {
   /**
    * InFlightReq holds the in-flight request middleware configuration.
    * This middleware limits the number of requests being processed and served concurrently.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/inflightreq/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/inflightreq/
    *
    * @schema MiddlewareSpec#inFlightReq
    */
@@ -1717,16 +1961,13 @@ export interface MiddlewareSpec {
   /**
    * IPAllowList holds the IP allowlist middleware configuration.
    * This middleware limits allowed requests based on the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/
    *
    * @schema MiddlewareSpec#ipAllowList
    */
   readonly ipAllowList?: MiddlewareSpecIpAllowList;
 
   /**
-   * IPWhiteList holds the IP whitelist middleware configuration.
-   * This middleware limits allowed requests based on the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipwhitelist/
    * Deprecated: please use IPAllowList instead.
    *
    * @schema MiddlewareSpec#ipWhiteList
@@ -1736,7 +1977,7 @@ export interface MiddlewareSpec {
   /**
    * PassTLSClientCert holds the pass TLS client cert middleware configuration.
    * This middleware adds the selected data from the passed client TLS certificate to a header.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/passtlsclientcert/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/passtlsclientcert/
    *
    * @schema MiddlewareSpec#passTLSClientCert
    */
@@ -1753,7 +1994,7 @@ export interface MiddlewareSpec {
   /**
    * RateLimit holds the rate limit configuration.
    * This middleware ensures that services will receive a fair amount of requests, and allows one to define what fair is.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ratelimit/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ratelimit/
    *
    * @schema MiddlewareSpec#rateLimit
    */
@@ -1762,7 +2003,7 @@ export interface MiddlewareSpec {
   /**
    * RedirectRegex holds the redirect regex middleware configuration.
    * This middleware redirects a request using regex matching and replacement.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/redirectregex/#regex
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/redirectregex/#regex
    *
    * @schema MiddlewareSpec#redirectRegex
    */
@@ -1771,7 +2012,7 @@ export interface MiddlewareSpec {
   /**
    * RedirectScheme holds the redirect scheme middleware configuration.
    * This middleware redirects requests from a scheme/port to another.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/redirectscheme/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/redirectscheme/
    *
    * @schema MiddlewareSpec#redirectScheme
    */
@@ -1780,7 +2021,7 @@ export interface MiddlewareSpec {
   /**
    * ReplacePath holds the replace path middleware configuration.
    * This middleware replaces the path of the request URL and store the original path in an X-Replaced-Path header.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/replacepath/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/replacepath/
    *
    * @schema MiddlewareSpec#replacePath
    */
@@ -1789,7 +2030,7 @@ export interface MiddlewareSpec {
   /**
    * ReplacePathRegex holds the replace path regex middleware configuration.
    * This middleware replaces the path of a URL using regex matching and replacement.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/replacepathregex/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/replacepathregex/
    *
    * @schema MiddlewareSpec#replacePathRegex
    */
@@ -1799,7 +2040,7 @@ export interface MiddlewareSpec {
    * Retry holds the retry middleware configuration.
    * This middleware reissues requests a given number of times to a backend server if that server does not reply.
    * As soon as the server answers, the middleware stops retrying, regardless of the response status.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/retry/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/retry/
    *
    * @schema MiddlewareSpec#retry
    */
@@ -1808,7 +2049,7 @@ export interface MiddlewareSpec {
   /**
    * StripPrefix holds the strip prefix middleware configuration.
    * This middleware removes the specified prefixes from the URL path.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/stripprefix/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/stripprefix/
    *
    * @schema MiddlewareSpec#stripPrefix
    */
@@ -1817,7 +2058,7 @@ export interface MiddlewareSpec {
   /**
    * StripPrefixRegex holds the strip prefix regex middleware configuration.
    * This middleware removes the matching prefixes from the URL path.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/stripprefixregex/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/stripprefixregex/
    *
    * @schema MiddlewareSpec#stripPrefixRegex
    */
@@ -1842,6 +2083,7 @@ export function toJson_MiddlewareSpec(obj: MiddlewareSpec | undefined): Record<s
     'digestAuth': toJson_MiddlewareSpecDigestAuth(obj.digestAuth),
     'errors': toJson_MiddlewareSpecErrors(obj.errors),
     'forwardAuth': toJson_MiddlewareSpecForwardAuth(obj.forwardAuth),
+    'grpcWeb': toJson_MiddlewareSpecGrpcWeb(obj.grpcWeb),
     'headers': toJson_MiddlewareSpecHeaders(obj.headers),
     'inFlightReq': toJson_MiddlewareSpecInFlightReq(obj.inFlightReq),
     'ipAllowList': toJson_MiddlewareSpecIpAllowList(obj.ipAllowList),
@@ -1865,7 +2107,7 @@ export function toJson_MiddlewareSpec(obj: MiddlewareSpec | undefined): Record<s
 /**
  * AddPrefix holds the add prefix middleware configuration.
  * This middleware updates the path of a request before forwarding it.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/addprefix/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/addprefix/
  *
  * @schema MiddlewareSpecAddPrefix
  */
@@ -1897,14 +2139,14 @@ export function toJson_MiddlewareSpecAddPrefix(obj: MiddlewareSpecAddPrefix | un
 /**
  * BasicAuth holds the basic auth middleware configuration.
  * This middleware restricts access to your services to known users.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/basicauth/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/basicauth/
  *
  * @schema MiddlewareSpecBasicAuth
  */
 export interface MiddlewareSpecBasicAuth {
   /**
    * HeaderField defines a header field to store the authenticated user.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/basicauth/#headerfield
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/basicauth/#headerfield
    *
    * @schema MiddlewareSpecBasicAuth#headerField
    */
@@ -1955,7 +2197,7 @@ export function toJson_MiddlewareSpecBasicAuth(obj: MiddlewareSpecBasicAuth | un
 /**
  * Buffering holds the buffering middleware configuration.
  * This middleware retries or limits the size of requests that can be forwarded to backends.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/buffering/#maxrequestbodybytes
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/buffering/#maxrequestbodybytes
  *
  * @schema MiddlewareSpecBuffering
  */
@@ -1997,7 +2239,7 @@ export interface MiddlewareSpecBuffering {
   /**
    * RetryExpression defines the retry conditions.
    * It is a logical combination of functions with operators AND (&&) and OR (||).
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/buffering/#retryexpression
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/buffering/#retryexpression
    *
    * @schema MiddlewareSpecBuffering#retryExpression
    */
@@ -2026,7 +2268,7 @@ export function toJson_MiddlewareSpecBuffering(obj: MiddlewareSpecBuffering | un
 /**
  * Chain holds the configuration of the chain middleware.
  * This middleware enables to define reusable combinations of other pieces of middleware.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/chain/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/chain/
  *
  * @schema MiddlewareSpecChain
  */
@@ -2088,6 +2330,13 @@ export interface MiddlewareSpecCircuitBreaker {
    */
   readonly recoveryDuration?: MiddlewareSpecCircuitBreakerRecoveryDuration;
 
+  /**
+   * ResponseCode is the status code that the circuit breaker will return while it is in the open state.
+   *
+   * @schema MiddlewareSpecCircuitBreaker#responseCode
+   */
+  readonly responseCode?: number;
+
 }
 
 /**
@@ -2101,6 +2350,7 @@ export function toJson_MiddlewareSpecCircuitBreaker(obj: MiddlewareSpecCircuitBr
     'expression': obj.expression,
     'fallbackDuration': obj.fallbackDuration?.value,
     'recoveryDuration': obj.recoveryDuration?.value,
+    'responseCode': obj.responseCode,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -2109,18 +2359,40 @@ export function toJson_MiddlewareSpecCircuitBreaker(obj: MiddlewareSpecCircuitBr
 
 /**
  * Compress holds the compress middleware configuration.
- * This middleware compresses responses before sending them to the client, using gzip compression.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/compress/
+ * This middleware compresses responses before sending them to the client, using gzip, brotli, or zstd compression.
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/compress/
  *
  * @schema MiddlewareSpecCompress
  */
 export interface MiddlewareSpecCompress {
   /**
+   * DefaultEncoding specifies the default encoding if the `Accept-Encoding` header is not in the request or contains a wildcard (`*`).
+   *
+   * @schema MiddlewareSpecCompress#defaultEncoding
+   */
+  readonly defaultEncoding?: string;
+
+  /**
+   * Encodings defines the list of supported compression algorithms.
+   *
+   * @schema MiddlewareSpecCompress#encodings
+   */
+  readonly encodings?: string[];
+
+  /**
    * ExcludedContentTypes defines the list of content types to compare the Content-Type header of the incoming requests and responses before compressing.
+   * `application/grpc` is always excluded.
    *
    * @schema MiddlewareSpecCompress#excludedContentTypes
    */
   readonly excludedContentTypes?: string[];
+
+  /**
+   * IncludedContentTypes defines the list of content types to compare the Content-Type header of the responses before compressing.
+   *
+   * @schema MiddlewareSpecCompress#includedContentTypes
+   */
+  readonly includedContentTypes?: string[];
 
   /**
    * MinResponseBodyBytes defines the minimum amount of bytes a response body must have to be compressed.
@@ -2139,7 +2411,10 @@ export interface MiddlewareSpecCompress {
 export function toJson_MiddlewareSpecCompress(obj: MiddlewareSpecCompress | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'defaultEncoding': obj.defaultEncoding,
+    'encodings': obj.encodings?.map(y => y),
     'excludedContentTypes': obj.excludedContentTypes?.map(y => y),
+    'includedContentTypes': obj.includedContentTypes?.map(y => y),
     'minResponseBodyBytes': obj.minResponseBodyBytes,
   };
   // filter undefined values
@@ -2157,9 +2432,7 @@ export interface MiddlewareSpecContentType {
   /**
    * AutoDetect specifies whether to let the `Content-Type` header, if it has not been set by the backend,
    * be automatically set to a value derived from the contents of the response.
-   * As a proxy, the default behavior should be to leave the header alone, regardless of what the backend did with it.
-   * However, the historic default was to always auto-detect and set the header if it was nil,
-   * and it is going to be kept that way in order to support users currently relying on it.
+   * Deprecated: AutoDetect option is deprecated, Content-Type middleware is only meant to be used to enable the content-type detection, please remove any usage of this option.
    *
    * @schema MiddlewareSpecContentType#autoDetect
    */
@@ -2184,14 +2457,14 @@ export function toJson_MiddlewareSpecContentType(obj: MiddlewareSpecContentType 
 /**
  * DigestAuth holds the digest auth middleware configuration.
  * This middleware restricts access to your services to known users.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/digestauth/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/digestauth/
  *
  * @schema MiddlewareSpecDigestAuth
  */
 export interface MiddlewareSpecDigestAuth {
   /**
    * HeaderField defines a header field to store the authenticated user.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/basicauth/#headerfield
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/basicauth/#headerfield
    *
    * @schema MiddlewareSpecDigestAuth#headerField
    */
@@ -2241,7 +2514,7 @@ export function toJson_MiddlewareSpecDigestAuth(obj: MiddlewareSpecDigestAuth | 
 /**
  * ErrorPage holds the custom error middleware configuration.
  * This middleware returns a custom page in lieu of the default, according to configured ranges of HTTP Status codes.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/errorpages/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/errorpages/
  *
  * @schema MiddlewareSpecErrors
  */
@@ -2256,7 +2529,7 @@ export interface MiddlewareSpecErrors {
 
   /**
    * Service defines the reference to a Kubernetes Service that will serve the error page.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/errorpages/#service
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/errorpages/#service
    *
    * @schema MiddlewareSpecErrors#service
    */
@@ -2294,11 +2567,18 @@ export function toJson_MiddlewareSpecErrors(obj: MiddlewareSpecErrors | undefine
 /**
  * ForwardAuth holds the forward auth middleware configuration.
  * This middleware delegates the request authentication to a Service.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/forwardauth/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/forwardauth/
  *
  * @schema MiddlewareSpecForwardAuth
  */
 export interface MiddlewareSpecForwardAuth {
+  /**
+   * AddAuthCookiesToResponse defines the list of cookies to copy from the authentication server response to the response.
+   *
+   * @schema MiddlewareSpecForwardAuth#addAuthCookiesToResponse
+   */
+  readonly addAuthCookiesToResponse?: string[];
+
   /**
    * Address defines the authentication server address.
    *
@@ -2323,7 +2603,7 @@ export interface MiddlewareSpecForwardAuth {
 
   /**
    * AuthResponseHeadersRegex defines the regex to match headers to copy from the authentication server response and set on forwarded request, after stripping all headers that match the regex.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/forwardauth/#authresponseheadersregex
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/forwardauth/#authresponseheadersregex
    *
    * @schema MiddlewareSpecForwardAuth#authResponseHeadersRegex
    */
@@ -2352,6 +2632,7 @@ export interface MiddlewareSpecForwardAuth {
 export function toJson_MiddlewareSpecForwardAuth(obj: MiddlewareSpecForwardAuth | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'addAuthCookiesToResponse': obj.addAuthCookiesToResponse?.map(y => y),
     'address': obj.address,
     'authRequestHeaders': obj.authRequestHeaders?.map(y => y),
     'authResponseHeaders': obj.authResponseHeaders?.map(y => y),
@@ -2365,9 +2646,40 @@ export function toJson_MiddlewareSpecForwardAuth(obj: MiddlewareSpecForwardAuth 
 /* eslint-enable max-len, quote-props */
 
 /**
+ * GrpcWeb holds the gRPC web middleware configuration.
+ * This middleware converts a gRPC web request to an HTTP/2 gRPC request.
+ *
+ * @schema MiddlewareSpecGrpcWeb
+ */
+export interface MiddlewareSpecGrpcWeb {
+  /**
+   * AllowOrigins is a list of allowable origins.
+   * Can also be a wildcard origin "*".
+   *
+   * @schema MiddlewareSpecGrpcWeb#allowOrigins
+   */
+  readonly allowOrigins?: string[];
+
+}
+
+/**
+ * Converts an object of type 'MiddlewareSpecGrpcWeb' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_MiddlewareSpecGrpcWeb(obj: MiddlewareSpecGrpcWeb | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'allowOrigins': obj.allowOrigins?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
  * Headers holds the headers middleware configuration.
  * This middleware manages the requests and responses headers.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/headers/#customrequestheaders
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/headers/#customrequestheaders
  *
  * @schema MiddlewareSpecHeaders
  */
@@ -2450,6 +2762,13 @@ export interface MiddlewareSpecHeaders {
   readonly contentSecurityPolicy?: string;
 
   /**
+   * ContentSecurityPolicyReportOnly defines the Content-Security-Policy-Report-Only header value.
+   *
+   * @schema MiddlewareSpecHeaders#contentSecurityPolicyReportOnly
+   */
+  readonly contentSecurityPolicyReportOnly?: string;
+
+  /**
    * ContentTypeNosniff defines whether to add the X-Content-Type-Options header with the nosniff value.
    *
    * @schema MiddlewareSpecHeaders#contentTypeNosniff
@@ -2487,7 +2806,7 @@ export interface MiddlewareSpecHeaders {
   readonly customResponseHeaders?: { [key: string]: string };
 
   /**
-   * Deprecated: use PermissionsPolicy instead.
+   * Deprecated: FeaturePolicy option is deprecated, please use PermissionsPolicy instead.
    *
    * @schema MiddlewareSpecHeaders#featurePolicy
    */
@@ -2548,14 +2867,14 @@ export interface MiddlewareSpecHeaders {
   readonly referrerPolicy?: string;
 
   /**
-   * Deprecated: use RedirectRegex instead.
+   * Deprecated: SSLForceHost option is deprecated, please use RedirectRegex instead.
    *
    * @schema MiddlewareSpecHeaders#sslForceHost
    */
   readonly sslForceHost?: boolean;
 
   /**
-   * Deprecated: use RedirectRegex instead.
+   * Deprecated: SSLHost option is deprecated, please use RedirectRegex instead.
    *
    * @schema MiddlewareSpecHeaders#sslHost
    */
@@ -2570,14 +2889,14 @@ export interface MiddlewareSpecHeaders {
   readonly sslProxyHeaders?: { [key: string]: string };
 
   /**
-   * Deprecated: use EntryPoint redirection or RedirectScheme instead.
+   * Deprecated: SSLRedirect option is deprecated, please use EntryPoint redirection or RedirectScheme instead.
    *
    * @schema MiddlewareSpecHeaders#sslRedirect
    */
   readonly sslRedirect?: boolean;
 
   /**
-   * Deprecated: use EntryPoint redirection or RedirectScheme instead.
+   * Deprecated: SSLTemporaryRedirect option is deprecated, please use EntryPoint redirection or RedirectScheme instead.
    *
    * @schema MiddlewareSpecHeaders#sslTemporaryRedirect
    */
@@ -2625,6 +2944,7 @@ export function toJson_MiddlewareSpecHeaders(obj: MiddlewareSpecHeaders | undefi
     'allowedHosts': obj.allowedHosts?.map(y => y),
     'browserXssFilter': obj.browserXssFilter,
     'contentSecurityPolicy': obj.contentSecurityPolicy,
+    'contentSecurityPolicyReportOnly': obj.contentSecurityPolicyReportOnly,
     'contentTypeNosniff': obj.contentTypeNosniff,
     'customBrowserXSSValue': obj.customBrowserXssValue,
     'customFrameOptionsValue': obj.customFrameOptionsValue,
@@ -2655,7 +2975,7 @@ export function toJson_MiddlewareSpecHeaders(obj: MiddlewareSpecHeaders | undefi
 /**
  * InFlightReq holds the in-flight request middleware configuration.
  * This middleware limits the number of requests being processed and served concurrently.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/inflightreq/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/inflightreq/
  *
  * @schema MiddlewareSpecInFlightReq
  */
@@ -2672,7 +2992,7 @@ export interface MiddlewareSpecInFlightReq {
    * SourceCriterion defines what criterion is used to group requests as originating from a common source.
    * If several strategies are defined at the same time, an error will be raised.
    * If none are set, the default is to use the requestHost.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/inflightreq/#sourcecriterion
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/inflightreq/#sourcecriterion
    *
    * @schema MiddlewareSpecInFlightReq#sourceCriterion
    */
@@ -2698,18 +3018,26 @@ export function toJson_MiddlewareSpecInFlightReq(obj: MiddlewareSpecInFlightReq 
 /**
  * IPAllowList holds the IP allowlist middleware configuration.
  * This middleware limits allowed requests based on the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/
  *
  * @schema MiddlewareSpecIpAllowList
  */
 export interface MiddlewareSpecIpAllowList {
   /**
    * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
    *
    * @schema MiddlewareSpecIpAllowList#ipStrategy
    */
   readonly ipStrategy?: MiddlewareSpecIpAllowListIpStrategy;
+
+  /**
+   * RejectStatusCode defines the HTTP status code used for refused requests.
+   * If not set, the default is 403 (Forbidden).
+   *
+   * @schema MiddlewareSpecIpAllowList#rejectStatusCode
+   */
+  readonly rejectStatusCode?: number;
 
   /**
    * SourceRange defines the set of allowed IPs (or ranges of allowed IPs by using CIDR notation).
@@ -2728,6 +3056,7 @@ export function toJson_MiddlewareSpecIpAllowList(obj: MiddlewareSpecIpAllowList 
   if (obj === undefined) { return undefined; }
   const result = {
     'ipStrategy': toJson_MiddlewareSpecIpAllowListIpStrategy(obj.ipStrategy),
+    'rejectStatusCode': obj.rejectStatusCode,
     'sourceRange': obj.sourceRange?.map(y => y),
   };
   // filter undefined values
@@ -2736,9 +3065,6 @@ export function toJson_MiddlewareSpecIpAllowList(obj: MiddlewareSpecIpAllowList 
 /* eslint-enable max-len, quote-props */
 
 /**
- * IPWhiteList holds the IP whitelist middleware configuration.
- * This middleware limits allowed requests based on the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipwhitelist/
  * Deprecated: please use IPAllowList instead.
  *
  * @schema MiddlewareSpecIpWhiteList
@@ -2746,7 +3072,7 @@ export function toJson_MiddlewareSpecIpAllowList(obj: MiddlewareSpecIpAllowList 
 export interface MiddlewareSpecIpWhiteList {
   /**
    * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
    *
    * @schema MiddlewareSpecIpWhiteList#ipStrategy
    */
@@ -2779,7 +3105,7 @@ export function toJson_MiddlewareSpecIpWhiteList(obj: MiddlewareSpecIpWhiteList 
 /**
  * PassTLSClientCert holds the pass TLS client cert middleware configuration.
  * This middleware adds the selected data from the passed client TLS certificate to a header.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/passtlsclientcert/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/passtlsclientcert/
  *
  * @schema MiddlewareSpecPassTlsClientCert
  */
@@ -2818,7 +3144,7 @@ export function toJson_MiddlewareSpecPassTlsClientCert(obj: MiddlewareSpecPassTl
 /**
  * RateLimit holds the rate limit configuration.
  * This middleware ensures that services will receive a fair amount of requests, and allows one to define what fair is.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ratelimit/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ratelimit/
  *
  * @schema MiddlewareSpecRateLimit
  */
@@ -2880,7 +3206,7 @@ export function toJson_MiddlewareSpecRateLimit(obj: MiddlewareSpecRateLimit | un
 /**
  * RedirectRegex holds the redirect regex middleware configuration.
  * This middleware redirects a request using regex matching and replacement.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/redirectregex/#regex
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/redirectregex/#regex
  *
  * @schema MiddlewareSpecRedirectRegex
  */
@@ -2927,7 +3253,7 @@ export function toJson_MiddlewareSpecRedirectRegex(obj: MiddlewareSpecRedirectRe
 /**
  * RedirectScheme holds the redirect scheme middleware configuration.
  * This middleware redirects requests from a scheme/port to another.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/redirectscheme/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/redirectscheme/
  *
  * @schema MiddlewareSpecRedirectScheme
  */
@@ -2974,7 +3300,7 @@ export function toJson_MiddlewareSpecRedirectScheme(obj: MiddlewareSpecRedirectS
 /**
  * ReplacePath holds the replace path middleware configuration.
  * This middleware replaces the path of the request URL and store the original path in an X-Replaced-Path header.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/replacepath/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/replacepath/
  *
  * @schema MiddlewareSpecReplacePath
  */
@@ -3005,7 +3331,7 @@ export function toJson_MiddlewareSpecReplacePath(obj: MiddlewareSpecReplacePath 
 /**
  * ReplacePathRegex holds the replace path regex middleware configuration.
  * This middleware replaces the path of a URL using regex matching and replacement.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/replacepathregex/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/replacepathregex/
  *
  * @schema MiddlewareSpecReplacePathRegex
  */
@@ -3045,7 +3371,7 @@ export function toJson_MiddlewareSpecReplacePathRegex(obj: MiddlewareSpecReplace
  * Retry holds the retry middleware configuration.
  * This middleware reissues requests a given number of times to a backend server if that server does not reply.
  * As soon as the server answers, the middleware stops retrying, regardless of the response status.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/retry/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/retry/
  *
  * @schema MiddlewareSpecRetry
  */
@@ -3088,12 +3414,13 @@ export function toJson_MiddlewareSpecRetry(obj: MiddlewareSpecRetry | undefined)
 /**
  * StripPrefix holds the strip prefix middleware configuration.
  * This middleware removes the specified prefixes from the URL path.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/stripprefix/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/stripprefix/
  *
  * @schema MiddlewareSpecStripPrefix
  */
 export interface MiddlewareSpecStripPrefix {
   /**
+   * Deprecated: ForceSlash option is deprecated, please remove any usage of this option.
    * ForceSlash ensures that the resulting stripped path is not the empty string, by replacing it with / when necessary.
    * Default: true.
    *
@@ -3128,7 +3455,7 @@ export function toJson_MiddlewareSpecStripPrefix(obj: MiddlewareSpecStripPrefix 
 /**
  * StripPrefixRegex holds the strip prefix regex middleware configuration.
  * This middleware removes the matching prefixes from the URL path.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/stripprefixregex/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/stripprefixregex/
  *
  * @schema MiddlewareSpecStripPrefixRegex
  */
@@ -3243,11 +3570,18 @@ export class MiddlewareSpecCircuitBreakerRecoveryDuration {
 
 /**
  * Service defines the reference to a Kubernetes Service that will serve the error page.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/errorpages/#service
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/errorpages/#service
  *
  * @schema MiddlewareSpecErrorsService
  */
 export interface MiddlewareSpecErrorsService {
+  /**
+   * Healthcheck defines health checks for ExternalName services.
+   *
+   * @schema MiddlewareSpecErrorsService#healthCheck
+   */
+  readonly healthCheck?: MiddlewareSpecErrorsServiceHealthCheck;
+
   /**
    * Kind defines the kind of the Service.
    *
@@ -3279,6 +3613,16 @@ export interface MiddlewareSpecErrorsService {
    * @schema MiddlewareSpecErrorsService#nativeLB
    */
   readonly nativeLb?: boolean;
+
+  /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema MiddlewareSpecErrorsService#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
 
   /**
    * PassHostHeader defines whether the client Host header is forwarded to the upstream Kubernetes Service.
@@ -3322,7 +3666,7 @@ export interface MiddlewareSpecErrorsService {
 
   /**
    * Sticky defines the sticky sessions configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
    *
    * @schema MiddlewareSpecErrorsService#sticky
    */
@@ -3353,10 +3697,12 @@ export interface MiddlewareSpecErrorsService {
 export function toJson_MiddlewareSpecErrorsService(obj: MiddlewareSpecErrorsService | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'healthCheck': toJson_MiddlewareSpecErrorsServiceHealthCheck(obj.healthCheck),
     'kind': obj.kind,
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'passHostHeader': obj.passHostHeader,
     'port': obj.port?.value,
     'responseForwarding': toJson_MiddlewareSpecErrorsServiceResponseForwarding(obj.responseForwarding),
@@ -3378,6 +3724,8 @@ export function toJson_MiddlewareSpecErrorsService(obj: MiddlewareSpecErrorsServ
  */
 export interface MiddlewareSpecForwardAuthTls {
   /**
+   * Deprecated: TLS client authentication is a server side option (see https://github.com/golang/go/blob/740a490f71d026bb7d2d13cb8fa2d6d6e0572b70/src/crypto/tls/common.go#L634).
+   *
    * @schema MiddlewareSpecForwardAuthTls#caOptional
    */
   readonly caOptional?: boolean;
@@ -3428,14 +3776,14 @@ export function toJson_MiddlewareSpecForwardAuthTls(obj: MiddlewareSpecForwardAu
  * SourceCriterion defines what criterion is used to group requests as originating from a common source.
  * If several strategies are defined at the same time, an error will be raised.
  * If none are set, the default is to use the requestHost.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/inflightreq/#sourcecriterion
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/inflightreq/#sourcecriterion
  *
  * @schema MiddlewareSpecInFlightReqSourceCriterion
  */
 export interface MiddlewareSpecInFlightReqSourceCriterion {
   /**
    * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
    *
    * @schema MiddlewareSpecInFlightReqSourceCriterion#ipStrategy
    */
@@ -3475,7 +3823,7 @@ export function toJson_MiddlewareSpecInFlightReqSourceCriterion(obj: MiddlewareS
 
 /**
  * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
  *
  * @schema MiddlewareSpecIpAllowListIpStrategy
  */
@@ -3494,6 +3842,13 @@ export interface MiddlewareSpecIpAllowListIpStrategy {
    */
   readonly excludedIPs?: string[];
 
+  /**
+   * IPv6Subnet configures Traefik to consider all IPv6 addresses from the defined subnet as originating from the same IP. Applies to RemoteAddrStrategy and DepthStrategy.
+   *
+   * @schema MiddlewareSpecIpAllowListIpStrategy#ipv6Subnet
+   */
+  readonly ipv6Subnet?: number;
+
 }
 
 /**
@@ -3505,6 +3860,7 @@ export function toJson_MiddlewareSpecIpAllowListIpStrategy(obj: MiddlewareSpecIp
   const result = {
     'depth': obj.depth,
     'excludedIPs': obj.excludedIPs?.map(y => y),
+    'ipv6Subnet': obj.ipv6Subnet,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -3513,7 +3869,7 @@ export function toJson_MiddlewareSpecIpAllowListIpStrategy(obj: MiddlewareSpecIp
 
 /**
  * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
  *
  * @schema MiddlewareSpecIpWhiteListIpStrategy
  */
@@ -3532,6 +3888,13 @@ export interface MiddlewareSpecIpWhiteListIpStrategy {
    */
   readonly excludedIPs?: string[];
 
+  /**
+   * IPv6Subnet configures Traefik to consider all IPv6 addresses from the defined subnet as originating from the same IP. Applies to RemoteAddrStrategy and DepthStrategy.
+   *
+   * @schema MiddlewareSpecIpWhiteListIpStrategy#ipv6Subnet
+   */
+  readonly ipv6Subnet?: number;
+
 }
 
 /**
@@ -3543,6 +3906,7 @@ export function toJson_MiddlewareSpecIpWhiteListIpStrategy(obj: MiddlewareSpecIp
   const result = {
     'depth': obj.depth,
     'excludedIPs': obj.excludedIPs?.map(y => y),
+    'ipv6Subnet': obj.ipv6Subnet,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -3645,7 +4009,7 @@ export class MiddlewareSpecRateLimitPeriod {
 export interface MiddlewareSpecRateLimitSourceCriterion {
   /**
    * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
    *
    * @schema MiddlewareSpecRateLimitSourceCriterion#ipStrategy
    */
@@ -3702,6 +4066,120 @@ export class MiddlewareSpecRetryInitialInterval {
   private constructor(public readonly value: number | string) {
   }
 }
+
+/**
+ * Healthcheck defines health checks for ExternalName services.
+ *
+ * @schema MiddlewareSpecErrorsServiceHealthCheck
+ */
+export interface MiddlewareSpecErrorsServiceHealthCheck {
+  /**
+   * FollowRedirects defines whether redirects should be followed during the health check calls.
+   * Default: true
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#followRedirects
+   */
+  readonly followRedirects?: boolean;
+
+  /**
+   * Headers defines custom headers to be sent to the health check endpoint.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#headers
+   */
+  readonly headers?: { [key: string]: string };
+
+  /**
+   * Hostname defines the value of hostname in the Host header of the health check request.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#hostname
+   */
+  readonly hostname?: string;
+
+  /**
+   * Interval defines the frequency of the health check calls.
+   * Default: 30s
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#interval
+   */
+  readonly interval?: MiddlewareSpecErrorsServiceHealthCheckInterval;
+
+  /**
+   * Method defines the healthcheck method.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#method
+   */
+  readonly method?: string;
+
+  /**
+   * Mode defines the health check mode.
+   * If defined to grpc, will use the gRPC health check protocol to probe the server.
+   * Default: http
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#mode
+   */
+  readonly mode?: string;
+
+  /**
+   * Path defines the server URL path for the health check endpoint.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#path
+   */
+  readonly path?: string;
+
+  /**
+   * Port defines the server URL port for the health check endpoint.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#port
+   */
+  readonly port?: number;
+
+  /**
+   * Scheme replaces the server URL scheme for the health check endpoint.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#scheme
+   */
+  readonly scheme?: string;
+
+  /**
+   * Status defines the expected HTTP status code of the response to the health check request.
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#status
+   */
+  readonly status?: number;
+
+  /**
+   * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+   * Default: 5s
+   *
+   * @schema MiddlewareSpecErrorsServiceHealthCheck#timeout
+   */
+  readonly timeout?: MiddlewareSpecErrorsServiceHealthCheckTimeout;
+
+}
+
+/**
+ * Converts an object of type 'MiddlewareSpecErrorsServiceHealthCheck' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_MiddlewareSpecErrorsServiceHealthCheck(obj: MiddlewareSpecErrorsServiceHealthCheck | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'followRedirects': obj.followRedirects,
+    'headers': ((obj.headers) === undefined) ? undefined : (Object.entries(obj.headers).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'hostname': obj.hostname,
+    'interval': obj.interval?.value,
+    'method': obj.method,
+    'mode': obj.mode,
+    'path': obj.path,
+    'port': obj.port,
+    'scheme': obj.scheme,
+    'status': obj.status,
+    'timeout': obj.timeout?.value,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
 
 /**
  * Kind defines the kind of the Service.
@@ -3767,7 +4245,7 @@ export function toJson_MiddlewareSpecErrorsServiceResponseForwarding(obj: Middle
 
 /**
  * Sticky defines the sticky sessions configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
  *
  * @schema MiddlewareSpecErrorsServiceSticky
  */
@@ -3797,7 +4275,7 @@ export function toJson_MiddlewareSpecErrorsServiceSticky(obj: MiddlewareSpecErro
 
 /**
  * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
  *
  * @schema MiddlewareSpecInFlightReqSourceCriterionIpStrategy
  */
@@ -3816,6 +4294,13 @@ export interface MiddlewareSpecInFlightReqSourceCriterionIpStrategy {
    */
   readonly excludedIPs?: string[];
 
+  /**
+   * IPv6Subnet configures Traefik to consider all IPv6 addresses from the defined subnet as originating from the same IP. Applies to RemoteAddrStrategy and DepthStrategy.
+   *
+   * @schema MiddlewareSpecInFlightReqSourceCriterionIpStrategy#ipv6Subnet
+   */
+  readonly ipv6Subnet?: number;
+
 }
 
 /**
@@ -3827,6 +4312,7 @@ export function toJson_MiddlewareSpecInFlightReqSourceCriterionIpStrategy(obj: M
   const result = {
     'depth': obj.depth,
     'excludedIPs': obj.excludedIPs?.map(y => y),
+    'ipv6Subnet': obj.ipv6Subnet,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -3997,7 +4483,7 @@ export function toJson_MiddlewareSpecPassTlsClientCertInfoSubject(obj: Middlewar
 
 /**
  * IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/http/ipallowlist/#ipstrategy
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/http/ipallowlist/#ipstrategy
  *
  * @schema MiddlewareSpecRateLimitSourceCriterionIpStrategy
  */
@@ -4016,6 +4502,13 @@ export interface MiddlewareSpecRateLimitSourceCriterionIpStrategy {
    */
   readonly excludedIPs?: string[];
 
+  /**
+   * IPv6Subnet configures Traefik to consider all IPv6 addresses from the defined subnet as originating from the same IP. Applies to RemoteAddrStrategy and DepthStrategy.
+   *
+   * @schema MiddlewareSpecRateLimitSourceCriterionIpStrategy#ipv6Subnet
+   */
+  readonly ipv6Subnet?: number;
+
 }
 
 /**
@@ -4027,11 +4520,46 @@ export function toJson_MiddlewareSpecRateLimitSourceCriterionIpStrategy(obj: Mid
   const result = {
     'depth': obj.depth,
     'excludedIPs': obj.excludedIPs?.map(y => y),
+    'ipv6Subnet': obj.ipv6Subnet,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, quote-props */
+
+/**
+ * Interval defines the frequency of the health check calls.
+ * Default: 30s
+ *
+ * @schema MiddlewareSpecErrorsServiceHealthCheckInterval
+ */
+export class MiddlewareSpecErrorsServiceHealthCheckInterval {
+  public static fromNumber(value: number): MiddlewareSpecErrorsServiceHealthCheckInterval {
+    return new MiddlewareSpecErrorsServiceHealthCheckInterval(value);
+  }
+  public static fromString(value: string): MiddlewareSpecErrorsServiceHealthCheckInterval {
+    return new MiddlewareSpecErrorsServiceHealthCheckInterval(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+ * Default: 5s
+ *
+ * @schema MiddlewareSpecErrorsServiceHealthCheckTimeout
+ */
+export class MiddlewareSpecErrorsServiceHealthCheckTimeout {
+  public static fromNumber(value: number): MiddlewareSpecErrorsServiceHealthCheckTimeout {
+    return new MiddlewareSpecErrorsServiceHealthCheckTimeout(value);
+  }
+  public static fromString(value: string): MiddlewareSpecErrorsServiceHealthCheckTimeout {
+    return new MiddlewareSpecErrorsServiceHealthCheckTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
 
 /**
  * Cookie defines the sticky cookie configuration.
@@ -4045,6 +4573,15 @@ export interface MiddlewareSpecErrorsServiceStickyCookie {
    * @schema MiddlewareSpecErrorsServiceStickyCookie#httpOnly
    */
   readonly httpOnly?: boolean;
+
+  /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema MiddlewareSpecErrorsServiceStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
 
   /**
    * Name defines the Cookie name.
@@ -4078,6 +4615,7 @@ export function toJson_MiddlewareSpecErrorsServiceStickyCookie(obj: MiddlewareSp
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,
@@ -4090,7 +4628,7 @@ export function toJson_MiddlewareSpecErrorsServiceStickyCookie(obj: MiddlewareSp
 
 /**
  * MiddlewareTCP is the CRD implementation of a Traefik TCP middleware.
-More info: https://doc.traefik.io/traefik/v2.11/middlewares/overview/
+More info: https://doc.traefik.io/traefik/v3.2/middlewares/overview/
  *
  * @schema MiddlewareTCP
  */
@@ -4145,7 +4683,7 @@ export class MiddlewareTcp extends ApiObject {
 
 /**
  * MiddlewareTCP is the CRD implementation of a Traefik TCP middleware.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/overview/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/overview/
  *
  * @schema MiddlewareTCP
  */
@@ -4195,7 +4733,7 @@ export interface MiddlewareTcpSpec {
   /**
    * IPAllowList defines the IPAllowList middleware configuration.
    * This middleware accepts/refuses connections based on the client IP.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/tcp/ipallowlist/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/tcp/ipallowlist/
    *
    * @schema MiddlewareTcpSpec#ipAllowList
    */
@@ -4205,7 +4743,7 @@ export interface MiddlewareTcpSpec {
    * IPWhiteList defines the IPWhiteList middleware configuration.
    * This middleware accepts/refuses connections based on the client IP.
    * Deprecated: please use IPAllowList instead.
-   * More info: https://doc.traefik.io/traefik/v2.11/middlewares/tcp/ipwhitelist/
+   * More info: https://doc.traefik.io/traefik/v3.2/middlewares/tcp/ipwhitelist/
    *
    * @schema MiddlewareTcpSpec#ipWhiteList
    */
@@ -4262,7 +4800,7 @@ export function toJson_MiddlewareTcpSpecInFlightConn(obj: MiddlewareTcpSpecInFli
 /**
  * IPAllowList defines the IPAllowList middleware configuration.
  * This middleware accepts/refuses connections based on the client IP.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/tcp/ipallowlist/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/tcp/ipallowlist/
  *
  * @schema MiddlewareTcpSpecIpAllowList
  */
@@ -4294,7 +4832,7 @@ export function toJson_MiddlewareTcpSpecIpAllowList(obj: MiddlewareTcpSpecIpAllo
  * IPWhiteList defines the IPWhiteList middleware configuration.
  * This middleware accepts/refuses connections based on the client IP.
  * Deprecated: please use IPAllowList instead.
- * More info: https://doc.traefik.io/traefik/v2.11/middlewares/tcp/ipwhitelist/
+ * More info: https://doc.traefik.io/traefik/v3.2/middlewares/tcp/ipwhitelist/
  *
  * @schema MiddlewareTcpSpecIpWhiteList
  */
@@ -4327,7 +4865,7 @@ export function toJson_MiddlewareTcpSpecIpWhiteList(obj: MiddlewareTcpSpecIpWhit
  * ServersTransport is the CRD implementation of a ServersTransport.
 If no serversTransport is specified, the default@internal will be used.
 The default@internal serversTransport is created from the static configuration.
-More info: https://doc.traefik.io/traefik/v2.11/routing/services/#serverstransport_1
+More info: https://doc.traefik.io/traefik/v3.2/routing/services/#serverstransport_1
  *
  * @schema ServersTransport
  */
@@ -4384,7 +4922,7 @@ export class ServersTransport extends ApiObject {
  * ServersTransport is the CRD implementation of a ServersTransport.
  * If no serversTransport is specified, the default@internal will be used.
  * The default@internal serversTransport is created from the static configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#serverstransport_1
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#serverstransport_1
  *
  * @schema ServersTransport
  */
@@ -4480,6 +5018,13 @@ export interface ServersTransportSpec {
    */
   readonly serverName?: string;
 
+  /**
+   * Spiffe defines the SPIFFE configuration.
+   *
+   * @schema ServersTransportSpec#spiffe
+   */
+  readonly spiffe?: ServersTransportSpecSpiffe;
+
 }
 
 /**
@@ -4497,6 +5042,7 @@ export function toJson_ServersTransportSpec(obj: ServersTransportSpec | undefine
     'peerCertURI': obj.peerCertUri,
     'rootCAsSecrets': obj.rootCAsSecrets?.map(y => y),
     'serverName': obj.serverName,
+    'spiffe': toJson_ServersTransportSpecSpiffe(obj.spiffe),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -4558,6 +5104,43 @@ export function toJson_ServersTransportSpecForwardingTimeouts(obj: ServersTransp
     'pingTimeout': obj.pingTimeout?.value,
     'readIdleTimeout': obj.readIdleTimeout?.value,
     'responseHeaderTimeout': obj.responseHeaderTimeout?.value,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Spiffe defines the SPIFFE configuration.
+ *
+ * @schema ServersTransportSpecSpiffe
+ */
+export interface ServersTransportSpecSpiffe {
+  /**
+   * IDs defines the allowed SPIFFE IDs (takes precedence over the SPIFFE TrustDomain).
+   *
+   * @schema ServersTransportSpecSpiffe#ids
+   */
+  readonly ids?: string[];
+
+  /**
+   * TrustDomain defines the allowed SPIFFE trust domain.
+   *
+   * @schema ServersTransportSpecSpiffe#trustDomain
+   */
+  readonly trustDomain?: string;
+
+}
+
+/**
+ * Converts an object of type 'ServersTransportSpecSpiffe' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_ServersTransportSpecSpiffe(obj: ServersTransportSpecSpiffe | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'ids': obj.ids?.map(y => y),
+    'trustDomain': obj.trustDomain,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -4646,8 +5229,312 @@ export class ServersTransportSpecForwardingTimeoutsResponseHeaderTimeout {
 
 
 /**
+ * ServersTransportTCP is the CRD implementation of a TCPServersTransport.
+If no tcpServersTransport is specified, a default one named default@internal will be used.
+The default@internal tcpServersTransport can be configured in the static configuration.
+More info: https://doc.traefik.io/traefik/v3.2/routing/services/#serverstransport_3
+ *
+ * @schema ServersTransportTCP
+ */
+export class ServersTransportTcp extends ApiObject {
+  /**
+   * Returns the apiVersion and kind for "ServersTransportTCP"
+   */
+  public static readonly GVK: GroupVersionKind = {
+    apiVersion: 'traefik.io/v1alpha1',
+    kind: 'ServersTransportTCP',
+  }
+
+  /**
+   * Renders a Kubernetes manifest for "ServersTransportTCP".
+   *
+   * This can be used to inline resource manifests inside other objects (e.g. as templates).
+   *
+   * @param props initialization props
+   */
+  public static manifest(props: ServersTransportTcpProps): any {
+    return {
+      ...ServersTransportTcp.GVK,
+      ...toJson_ServersTransportTcpProps(props),
+    };
+  }
+
+  /**
+   * Defines a "ServersTransportTCP" API object
+   * @param scope the scope in which to define this object
+   * @param id a scope-local name for the object
+   * @param props initialization props
+   */
+  public constructor(scope: Construct, id: string, props: ServersTransportTcpProps) {
+    super(scope, id, {
+      ...ServersTransportTcp.GVK,
+      ...props,
+    });
+  }
+
+  /**
+   * Renders the object to Kubernetes JSON.
+   */
+  public toJson(): any {
+    const resolved = super.toJson();
+
+    return {
+      ...ServersTransportTcp.GVK,
+      ...toJson_ServersTransportTcpProps(resolved),
+    };
+  }
+}
+
+/**
+ * ServersTransportTCP is the CRD implementation of a TCPServersTransport.
+ * If no tcpServersTransport is specified, a default one named default@internal will be used.
+ * The default@internal tcpServersTransport can be configured in the static configuration.
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#serverstransport_3
+ *
+ * @schema ServersTransportTCP
+ */
+export interface ServersTransportTcpProps {
+  /**
+   * @schema ServersTransportTCP#metadata
+   */
+  readonly metadata: ApiObjectMetadata;
+
+  /**
+   * ServersTransportTCPSpec defines the desired state of a ServersTransportTCP.
+   *
+   * @schema ServersTransportTCP#spec
+   */
+  readonly spec: ServersTransportTcpSpec;
+
+}
+
+/**
+ * Converts an object of type 'ServersTransportTcpProps' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_ServersTransportTcpProps(obj: ServersTransportTcpProps | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'metadata': obj.metadata,
+    'spec': toJson_ServersTransportTcpSpec(obj.spec),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * ServersTransportTCPSpec defines the desired state of a ServersTransportTCP.
+ *
+ * @schema ServersTransportTcpSpec
+ */
+export interface ServersTransportTcpSpec {
+  /**
+   * DialKeepAlive is the interval between keep-alive probes for an active network connection. If zero, keep-alive probes are sent with a default value (currently 15 seconds), if supported by the protocol and operating system. Network protocols or operating systems that do not support keep-alives ignore this field. If negative, keep-alive probes are disabled.
+   *
+   * @schema ServersTransportTcpSpec#dialKeepAlive
+   */
+  readonly dialKeepAlive?: ServersTransportTcpSpecDialKeepAlive;
+
+  /**
+   * DialTimeout is the amount of time to wait until a connection to a backend server can be established.
+   *
+   * @schema ServersTransportTcpSpec#dialTimeout
+   */
+  readonly dialTimeout?: ServersTransportTcpSpecDialTimeout;
+
+  /**
+   * TerminationDelay defines the delay to wait before fully terminating the connection, after one connected peer has closed its writing capability.
+   *
+   * @schema ServersTransportTcpSpec#terminationDelay
+   */
+  readonly terminationDelay?: ServersTransportTcpSpecTerminationDelay;
+
+  /**
+   * TLS defines the TLS configuration
+   *
+   * @schema ServersTransportTcpSpec#tls
+   */
+  readonly tls?: ServersTransportTcpSpecTls;
+
+}
+
+/**
+ * Converts an object of type 'ServersTransportTcpSpec' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_ServersTransportTcpSpec(obj: ServersTransportTcpSpec | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'dialKeepAlive': obj.dialKeepAlive?.value,
+    'dialTimeout': obj.dialTimeout?.value,
+    'terminationDelay': obj.terminationDelay?.value,
+    'tls': toJson_ServersTransportTcpSpecTls(obj.tls),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * DialKeepAlive is the interval between keep-alive probes for an active network connection. If zero, keep-alive probes are sent with a default value (currently 15 seconds), if supported by the protocol and operating system. Network protocols or operating systems that do not support keep-alives ignore this field. If negative, keep-alive probes are disabled.
+ *
+ * @schema ServersTransportTcpSpecDialKeepAlive
+ */
+export class ServersTransportTcpSpecDialKeepAlive {
+  public static fromNumber(value: number): ServersTransportTcpSpecDialKeepAlive {
+    return new ServersTransportTcpSpecDialKeepAlive(value);
+  }
+  public static fromString(value: string): ServersTransportTcpSpecDialKeepAlive {
+    return new ServersTransportTcpSpecDialKeepAlive(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * DialTimeout is the amount of time to wait until a connection to a backend server can be established.
+ *
+ * @schema ServersTransportTcpSpecDialTimeout
+ */
+export class ServersTransportTcpSpecDialTimeout {
+  public static fromNumber(value: number): ServersTransportTcpSpecDialTimeout {
+    return new ServersTransportTcpSpecDialTimeout(value);
+  }
+  public static fromString(value: string): ServersTransportTcpSpecDialTimeout {
+    return new ServersTransportTcpSpecDialTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * TerminationDelay defines the delay to wait before fully terminating the connection, after one connected peer has closed its writing capability.
+ *
+ * @schema ServersTransportTcpSpecTerminationDelay
+ */
+export class ServersTransportTcpSpecTerminationDelay {
+  public static fromNumber(value: number): ServersTransportTcpSpecTerminationDelay {
+    return new ServersTransportTcpSpecTerminationDelay(value);
+  }
+  public static fromString(value: string): ServersTransportTcpSpecTerminationDelay {
+    return new ServersTransportTcpSpecTerminationDelay(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * TLS defines the TLS configuration
+ *
+ * @schema ServersTransportTcpSpecTls
+ */
+export interface ServersTransportTcpSpecTls {
+  /**
+   * CertificatesSecrets defines a list of secret storing client certificates for mTLS.
+   *
+   * @schema ServersTransportTcpSpecTls#certificatesSecrets
+   */
+  readonly certificatesSecrets?: string[];
+
+  /**
+   * InsecureSkipVerify disables TLS certificate verification.
+   *
+   * @schema ServersTransportTcpSpecTls#insecureSkipVerify
+   */
+  readonly insecureSkipVerify?: boolean;
+
+  /**
+   * MaxIdleConnsPerHost controls the maximum idle (keep-alive) to keep per-host.
+   * PeerCertURI defines the peer cert URI used to match against SAN URI during the peer certificate verification.
+   *
+   * @schema ServersTransportTcpSpecTls#peerCertURI
+   */
+  readonly peerCertUri?: string;
+
+  /**
+   * RootCAsSecrets defines a list of CA secret used to validate self-signed certificates.
+   *
+   * @schema ServersTransportTcpSpecTls#rootCAsSecrets
+   */
+  readonly rootCAsSecrets?: string[];
+
+  /**
+   * ServerName defines the server name used to contact the server.
+   *
+   * @schema ServersTransportTcpSpecTls#serverName
+   */
+  readonly serverName?: string;
+
+  /**
+   * Spiffe defines the SPIFFE configuration.
+   *
+   * @schema ServersTransportTcpSpecTls#spiffe
+   */
+  readonly spiffe?: ServersTransportTcpSpecTlsSpiffe;
+
+}
+
+/**
+ * Converts an object of type 'ServersTransportTcpSpecTls' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_ServersTransportTcpSpecTls(obj: ServersTransportTcpSpecTls | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'certificatesSecrets': obj.certificatesSecrets?.map(y => y),
+    'insecureSkipVerify': obj.insecureSkipVerify,
+    'peerCertURI': obj.peerCertUri,
+    'rootCAsSecrets': obj.rootCAsSecrets?.map(y => y),
+    'serverName': obj.serverName,
+    'spiffe': toJson_ServersTransportTcpSpecTlsSpiffe(obj.spiffe),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Spiffe defines the SPIFFE configuration.
+ *
+ * @schema ServersTransportTcpSpecTlsSpiffe
+ */
+export interface ServersTransportTcpSpecTlsSpiffe {
+  /**
+   * IDs defines the allowed SPIFFE IDs (takes precedence over the SPIFFE TrustDomain).
+   *
+   * @schema ServersTransportTcpSpecTlsSpiffe#ids
+   */
+  readonly ids?: string[];
+
+  /**
+   * TrustDomain defines the allowed SPIFFE trust domain.
+   *
+   * @schema ServersTransportTcpSpecTlsSpiffe#trustDomain
+   */
+  readonly trustDomain?: string;
+
+}
+
+/**
+ * Converts an object of type 'ServersTransportTcpSpecTlsSpiffe' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_ServersTransportTcpSpecTlsSpiffe(obj: ServersTransportTcpSpecTlsSpiffe | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'ids': obj.ids?.map(y => y),
+    'trustDomain': obj.trustDomain,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+
+/**
  * TLSOption is the CRD implementation of a Traefik TLS Option, allowing to configure some parameters of the TLS connection.
-More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
  *
  * @schema TLSOption
  */
@@ -4702,7 +5589,7 @@ export class TlsOption extends ApiObject {
 
 /**
  * TLSOption is the CRD implementation of a Traefik TLS Option, allowing to configure some parameters of the TLS connection.
- * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#tls-options
+ * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#tls-options
  *
  * @schema TLSOption
  */
@@ -4744,7 +5631,7 @@ export function toJson_TlsOptionProps(obj: TlsOptionProps | undefined): Record<s
 export interface TlsOptionSpec {
   /**
    * ALPNProtocols defines the list of supported application level protocols for the TLS handshake, in order of preference.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#alpn-protocols
+   * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#alpn-protocols
    *
    * @schema TlsOptionSpec#alpnProtocols
    */
@@ -4752,7 +5639,7 @@ export interface TlsOptionSpec {
 
   /**
    * CipherSuites defines the list of supported cipher suites for TLS versions up to TLS 1.2.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#cipher-suites
+   * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#cipher-suites
    *
    * @schema TlsOptionSpec#cipherSuites
    */
@@ -4767,7 +5654,7 @@ export interface TlsOptionSpec {
 
   /**
    * CurvePreferences defines the preferred elliptic curves in a specific order.
-   * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#curve-preferences
+   * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#curve-preferences
    *
    * @schema TlsOptionSpec#curvePreferences
    */
@@ -4890,7 +5777,7 @@ export enum TlsOptionSpecClientAuthClientAuthType {
  * TLSStore is the CRD implementation of a Traefik TLS Store.
 For the time being, only the TLSStore named default is supported.
 This means that you cannot have two stores that are named default in different Kubernetes namespaces.
-More info: https://doc.traefik.io/traefik/v2.11/https/tls/#certificates-stores
+More info: https://doc.traefik.io/traefik/v3.2/https/tls/#certificates-stores
  *
  * @schema TLSStore
  */
@@ -4947,7 +5834,7 @@ export class TlsStore extends ApiObject {
  * TLSStore is the CRD implementation of a Traefik TLS Store.
  * For the time being, only the TLSStore named default is supported.
  * This means that you cannot have two stores that are named default in different Kubernetes namespaces.
- * More info: https://doc.traefik.io/traefik/v2.11/https/tls/#certificates-stores
+ * More info: https://doc.traefik.io/traefik/v3.2/https/tls/#certificates-stores
  *
  * @schema TLSStore
  */
@@ -5164,7 +6051,7 @@ export function toJson_TlsStoreSpecDefaultGeneratedCertDomain(obj: TlsStoreSpecD
 TraefikService object allows to:
 - Apply weight to Services on load-balancing
 - Mirror traffic on services
-More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-traefikservice
+More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-traefikservice
  *
  * @schema TraefikService
  */
@@ -5222,7 +6109,7 @@ export class TraefikService extends ApiObject {
  * TraefikService object allows to:
  * - Apply weight to Services on load-balancing
  * - Mirror traffic on services
- * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#kind-traefikservice
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#kind-traefikservice
  *
  * @schema TraefikService
  */
@@ -5300,6 +6187,13 @@ export function toJson_TraefikServiceSpec(obj: TraefikServiceSpec | undefined): 
  */
 export interface TraefikServiceSpecMirroring {
   /**
+   * Healthcheck defines health checks for ExternalName services.
+   *
+   * @schema TraefikServiceSpecMirroring#healthCheck
+   */
+  readonly healthCheck?: TraefikServiceSpecMirroringHealthCheck;
+
+  /**
    * Kind defines the kind of the Service.
    *
    * @schema TraefikServiceSpecMirroring#kind
@@ -5314,6 +6208,14 @@ export interface TraefikServiceSpecMirroring {
    * @schema TraefikServiceSpecMirroring#maxBodySize
    */
   readonly maxBodySize?: number;
+
+  /**
+   * MirrorBody defines whether the body of the request should be mirrored.
+   * Default value is true.
+   *
+   * @schema TraefikServiceSpecMirroring#mirrorBody
+   */
+  readonly mirrorBody?: boolean;
 
   /**
    * Mirrors defines the list of mirrors where Traefik will duplicate the traffic.
@@ -5346,6 +6248,16 @@ export interface TraefikServiceSpecMirroring {
    * @schema TraefikServiceSpecMirroring#nativeLB
    */
   readonly nativeLb?: boolean;
+
+  /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema TraefikServiceSpecMirroring#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
 
   /**
    * PassHostHeader defines whether the client Host header is forwarded to the upstream Kubernetes Service.
@@ -5389,7 +6301,7 @@ export interface TraefikServiceSpecMirroring {
 
   /**
    * Sticky defines the sticky sessions configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
    *
    * @schema TraefikServiceSpecMirroring#sticky
    */
@@ -5420,12 +6332,15 @@ export interface TraefikServiceSpecMirroring {
 export function toJson_TraefikServiceSpecMirroring(obj: TraefikServiceSpecMirroring | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'healthCheck': toJson_TraefikServiceSpecMirroringHealthCheck(obj.healthCheck),
     'kind': obj.kind,
     'maxBodySize': obj.maxBodySize,
+    'mirrorBody': obj.mirrorBody,
     'mirrors': obj.mirrors?.map(y => toJson_TraefikServiceSpecMirroringMirrors(y)),
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'passHostHeader': obj.passHostHeader,
     'port': obj.port?.value,
     'responseForwarding': toJson_TraefikServiceSpecMirroringResponseForwarding(obj.responseForwarding),
@@ -5455,7 +6370,7 @@ export interface TraefikServiceSpecWeighted {
 
   /**
    * Sticky defines whether sticky sessions are enabled.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#stickiness-and-load-balancing
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#stickiness-and-load-balancing
    *
    * @schema TraefikServiceSpecWeighted#sticky
    */
@@ -5472,6 +6387,120 @@ export function toJson_TraefikServiceSpecWeighted(obj: TraefikServiceSpecWeighte
   const result = {
     'services': obj.services?.map(y => toJson_TraefikServiceSpecWeightedServices(y)),
     'sticky': toJson_TraefikServiceSpecWeightedSticky(obj.sticky),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Healthcheck defines health checks for ExternalName services.
+ *
+ * @schema TraefikServiceSpecMirroringHealthCheck
+ */
+export interface TraefikServiceSpecMirroringHealthCheck {
+  /**
+   * FollowRedirects defines whether redirects should be followed during the health check calls.
+   * Default: true
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#followRedirects
+   */
+  readonly followRedirects?: boolean;
+
+  /**
+   * Headers defines custom headers to be sent to the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#headers
+   */
+  readonly headers?: { [key: string]: string };
+
+  /**
+   * Hostname defines the value of hostname in the Host header of the health check request.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#hostname
+   */
+  readonly hostname?: string;
+
+  /**
+   * Interval defines the frequency of the health check calls.
+   * Default: 30s
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#interval
+   */
+  readonly interval?: TraefikServiceSpecMirroringHealthCheckInterval;
+
+  /**
+   * Method defines the healthcheck method.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#method
+   */
+  readonly method?: string;
+
+  /**
+   * Mode defines the health check mode.
+   * If defined to grpc, will use the gRPC health check protocol to probe the server.
+   * Default: http
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#mode
+   */
+  readonly mode?: string;
+
+  /**
+   * Path defines the server URL path for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#path
+   */
+  readonly path?: string;
+
+  /**
+   * Port defines the server URL port for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#port
+   */
+  readonly port?: number;
+
+  /**
+   * Scheme replaces the server URL scheme for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#scheme
+   */
+  readonly scheme?: string;
+
+  /**
+   * Status defines the expected HTTP status code of the response to the health check request.
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#status
+   */
+  readonly status?: number;
+
+  /**
+   * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+   * Default: 5s
+   *
+   * @schema TraefikServiceSpecMirroringHealthCheck#timeout
+   */
+  readonly timeout?: TraefikServiceSpecMirroringHealthCheckTimeout;
+
+}
+
+/**
+ * Converts an object of type 'TraefikServiceSpecMirroringHealthCheck' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_TraefikServiceSpecMirroringHealthCheck(obj: TraefikServiceSpecMirroringHealthCheck | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'followRedirects': obj.followRedirects,
+    'headers': ((obj.headers) === undefined) ? undefined : (Object.entries(obj.headers).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'hostname': obj.hostname,
+    'interval': obj.interval?.value,
+    'method': obj.method,
+    'mode': obj.mode,
+    'path': obj.path,
+    'port': obj.port,
+    'scheme': obj.scheme,
+    'status': obj.status,
+    'timeout': obj.timeout?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -5496,6 +6525,13 @@ export enum TraefikServiceSpecMirroringKind {
  * @schema TraefikServiceSpecMirroringMirrors
  */
 export interface TraefikServiceSpecMirroringMirrors {
+  /**
+   * Healthcheck defines health checks for ExternalName services.
+   *
+   * @schema TraefikServiceSpecMirroringMirrors#healthCheck
+   */
+  readonly healthCheck?: TraefikServiceSpecMirroringMirrorsHealthCheck;
+
   /**
    * Kind defines the kind of the Service.
    *
@@ -5527,6 +6563,16 @@ export interface TraefikServiceSpecMirroringMirrors {
    * @schema TraefikServiceSpecMirroringMirrors#nativeLB
    */
   readonly nativeLb?: boolean;
+
+  /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema TraefikServiceSpecMirroringMirrors#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
 
   /**
    * PassHostHeader defines whether the client Host header is forwarded to the upstream Kubernetes Service.
@@ -5578,7 +6624,7 @@ export interface TraefikServiceSpecMirroringMirrors {
 
   /**
    * Sticky defines the sticky sessions configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
    *
    * @schema TraefikServiceSpecMirroringMirrors#sticky
    */
@@ -5609,10 +6655,12 @@ export interface TraefikServiceSpecMirroringMirrors {
 export function toJson_TraefikServiceSpecMirroringMirrors(obj: TraefikServiceSpecMirroringMirrors | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'healthCheck': toJson_TraefikServiceSpecMirroringMirrorsHealthCheck(obj.healthCheck),
     'kind': obj.kind,
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'passHostHeader': obj.passHostHeader,
     'percent': obj.percent,
     'port': obj.port?.value,
@@ -5680,7 +6728,7 @@ export function toJson_TraefikServiceSpecMirroringResponseForwarding(obj: Traefi
 
 /**
  * Sticky defines the sticky sessions configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
  *
  * @schema TraefikServiceSpecMirroringSticky
  */
@@ -5715,6 +6763,13 @@ export function toJson_TraefikServiceSpecMirroringSticky(obj: TraefikServiceSpec
  */
 export interface TraefikServiceSpecWeightedServices {
   /**
+   * Healthcheck defines health checks for ExternalName services.
+   *
+   * @schema TraefikServiceSpecWeightedServices#healthCheck
+   */
+  readonly healthCheck?: TraefikServiceSpecWeightedServicesHealthCheck;
+
+  /**
    * Kind defines the kind of the Service.
    *
    * @schema TraefikServiceSpecWeightedServices#kind
@@ -5745,6 +6800,16 @@ export interface TraefikServiceSpecWeightedServices {
    * @schema TraefikServiceSpecWeightedServices#nativeLB
    */
   readonly nativeLb?: boolean;
+
+  /**
+   * NodePortLB controls, when creating the load-balancer,
+   * whether the LB's children are directly the nodes internal IPs using the nodePort when the service type is NodePort.
+   * It allows services to be reachable when Traefik runs externally from the Kubernetes cluster but within the same network of the nodes.
+   * By default, NodePortLB is false.
+   *
+   * @schema TraefikServiceSpecWeightedServices#nodePortLB
+   */
+  readonly nodePortLb?: boolean;
 
   /**
    * PassHostHeader defines whether the client Host header is forwarded to the upstream Kubernetes Service.
@@ -5788,7 +6853,7 @@ export interface TraefikServiceSpecWeightedServices {
 
   /**
    * Sticky defines the sticky sessions configuration.
-   * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+   * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
    *
    * @schema TraefikServiceSpecWeightedServices#sticky
    */
@@ -5819,10 +6884,12 @@ export interface TraefikServiceSpecWeightedServices {
 export function toJson_TraefikServiceSpecWeightedServices(obj: TraefikServiceSpecWeightedServices | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
+    'healthCheck': toJson_TraefikServiceSpecWeightedServicesHealthCheck(obj.healthCheck),
     'kind': obj.kind,
     'name': obj.name,
     'namespace': obj.namespace,
     'nativeLB': obj.nativeLb,
+    'nodePortLB': obj.nodePortLb,
     'passHostHeader': obj.passHostHeader,
     'port': obj.port?.value,
     'responseForwarding': toJson_TraefikServiceSpecWeightedServicesResponseForwarding(obj.responseForwarding),
@@ -5839,7 +6906,7 @@ export function toJson_TraefikServiceSpecWeightedServices(obj: TraefikServiceSpe
 
 /**
  * Sticky defines whether sticky sessions are enabled.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/providers/kubernetes-crd/#stickiness-and-load-balancing
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/providers/kubernetes-crd/#stickiness-and-load-balancing
  *
  * @schema TraefikServiceSpecWeightedSticky
  */
@@ -5861,6 +6928,154 @@ export function toJson_TraefikServiceSpecWeightedSticky(obj: TraefikServiceSpecW
   if (obj === undefined) { return undefined; }
   const result = {
     'cookie': toJson_TraefikServiceSpecWeightedStickyCookie(obj.cookie),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Interval defines the frequency of the health check calls.
+ * Default: 30s
+ *
+ * @schema TraefikServiceSpecMirroringHealthCheckInterval
+ */
+export class TraefikServiceSpecMirroringHealthCheckInterval {
+  public static fromNumber(value: number): TraefikServiceSpecMirroringHealthCheckInterval {
+    return new TraefikServiceSpecMirroringHealthCheckInterval(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecMirroringHealthCheckInterval {
+    return new TraefikServiceSpecMirroringHealthCheckInterval(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+ * Default: 5s
+ *
+ * @schema TraefikServiceSpecMirroringHealthCheckTimeout
+ */
+export class TraefikServiceSpecMirroringHealthCheckTimeout {
+  public static fromNumber(value: number): TraefikServiceSpecMirroringHealthCheckTimeout {
+    return new TraefikServiceSpecMirroringHealthCheckTimeout(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecMirroringHealthCheckTimeout {
+    return new TraefikServiceSpecMirroringHealthCheckTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Healthcheck defines health checks for ExternalName services.
+ *
+ * @schema TraefikServiceSpecMirroringMirrorsHealthCheck
+ */
+export interface TraefikServiceSpecMirroringMirrorsHealthCheck {
+  /**
+   * FollowRedirects defines whether redirects should be followed during the health check calls.
+   * Default: true
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#followRedirects
+   */
+  readonly followRedirects?: boolean;
+
+  /**
+   * Headers defines custom headers to be sent to the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#headers
+   */
+  readonly headers?: { [key: string]: string };
+
+  /**
+   * Hostname defines the value of hostname in the Host header of the health check request.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#hostname
+   */
+  readonly hostname?: string;
+
+  /**
+   * Interval defines the frequency of the health check calls.
+   * Default: 30s
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#interval
+   */
+  readonly interval?: TraefikServiceSpecMirroringMirrorsHealthCheckInterval;
+
+  /**
+   * Method defines the healthcheck method.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#method
+   */
+  readonly method?: string;
+
+  /**
+   * Mode defines the health check mode.
+   * If defined to grpc, will use the gRPC health check protocol to probe the server.
+   * Default: http
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#mode
+   */
+  readonly mode?: string;
+
+  /**
+   * Path defines the server URL path for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#path
+   */
+  readonly path?: string;
+
+  /**
+   * Port defines the server URL port for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#port
+   */
+  readonly port?: number;
+
+  /**
+   * Scheme replaces the server URL scheme for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#scheme
+   */
+  readonly scheme?: string;
+
+  /**
+   * Status defines the expected HTTP status code of the response to the health check request.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#status
+   */
+  readonly status?: number;
+
+  /**
+   * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+   * Default: 5s
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsHealthCheck#timeout
+   */
+  readonly timeout?: TraefikServiceSpecMirroringMirrorsHealthCheckTimeout;
+
+}
+
+/**
+ * Converts an object of type 'TraefikServiceSpecMirroringMirrorsHealthCheck' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_TraefikServiceSpecMirroringMirrorsHealthCheck(obj: TraefikServiceSpecMirroringMirrorsHealthCheck | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'followRedirects': obj.followRedirects,
+    'headers': ((obj.headers) === undefined) ? undefined : (Object.entries(obj.headers).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'hostname': obj.hostname,
+    'interval': obj.interval?.value,
+    'method': obj.method,
+    'mode': obj.mode,
+    'path': obj.path,
+    'port': obj.port,
+    'scheme': obj.scheme,
+    'status': obj.status,
+    'timeout': obj.timeout?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -5931,7 +7146,7 @@ export function toJson_TraefikServiceSpecMirroringMirrorsResponseForwarding(obj:
 
 /**
  * Sticky defines the sticky sessions configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
  *
  * @schema TraefikServiceSpecMirroringMirrorsSticky
  */
@@ -5973,6 +7188,15 @@ export interface TraefikServiceSpecMirroringStickyCookie {
   readonly httpOnly?: boolean;
 
   /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema TraefikServiceSpecMirroringStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
+
+  /**
    * Name defines the Cookie name.
    *
    * @schema TraefikServiceSpecMirroringStickyCookie#name
@@ -6004,9 +7228,124 @@ export function toJson_TraefikServiceSpecMirroringStickyCookie(obj: TraefikServi
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, quote-props */
+
+/**
+ * Healthcheck defines health checks for ExternalName services.
+ *
+ * @schema TraefikServiceSpecWeightedServicesHealthCheck
+ */
+export interface TraefikServiceSpecWeightedServicesHealthCheck {
+  /**
+   * FollowRedirects defines whether redirects should be followed during the health check calls.
+   * Default: true
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#followRedirects
+   */
+  readonly followRedirects?: boolean;
+
+  /**
+   * Headers defines custom headers to be sent to the health check endpoint.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#headers
+   */
+  readonly headers?: { [key: string]: string };
+
+  /**
+   * Hostname defines the value of hostname in the Host header of the health check request.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#hostname
+   */
+  readonly hostname?: string;
+
+  /**
+   * Interval defines the frequency of the health check calls.
+   * Default: 30s
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#interval
+   */
+  readonly interval?: TraefikServiceSpecWeightedServicesHealthCheckInterval;
+
+  /**
+   * Method defines the healthcheck method.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#method
+   */
+  readonly method?: string;
+
+  /**
+   * Mode defines the health check mode.
+   * If defined to grpc, will use the gRPC health check protocol to probe the server.
+   * Default: http
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#mode
+   */
+  readonly mode?: string;
+
+  /**
+   * Path defines the server URL path for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#path
+   */
+  readonly path?: string;
+
+  /**
+   * Port defines the server URL port for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#port
+   */
+  readonly port?: number;
+
+  /**
+   * Scheme replaces the server URL scheme for the health check endpoint.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#scheme
+   */
+  readonly scheme?: string;
+
+  /**
+   * Status defines the expected HTTP status code of the response to the health check request.
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#status
+   */
+  readonly status?: number;
+
+  /**
+   * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+   * Default: 5s
+   *
+   * @schema TraefikServiceSpecWeightedServicesHealthCheck#timeout
+   */
+  readonly timeout?: TraefikServiceSpecWeightedServicesHealthCheckTimeout;
+
+}
+
+/**
+ * Converts an object of type 'TraefikServiceSpecWeightedServicesHealthCheck' to JSON representation.
+ */
+/* eslint-disable max-len, quote-props */
+export function toJson_TraefikServiceSpecWeightedServicesHealthCheck(obj: TraefikServiceSpecWeightedServicesHealthCheck | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'followRedirects': obj.followRedirects,
+    'headers': ((obj.headers) === undefined) ? undefined : (Object.entries(obj.headers).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'hostname': obj.hostname,
+    'interval': obj.interval?.value,
+    'method': obj.method,
+    'mode': obj.mode,
+    'path': obj.path,
+    'port': obj.port,
+    'scheme': obj.scheme,
+    'status': obj.status,
+    'timeout': obj.timeout?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -6077,7 +7416,7 @@ export function toJson_TraefikServiceSpecWeightedServicesResponseForwarding(obj:
 
 /**
  * Sticky defines the sticky sessions configuration.
- * More info: https://doc.traefik.io/traefik/v2.11/routing/services/#sticky-sessions
+ * More info: https://doc.traefik.io/traefik/v3.2/routing/services/#sticky-sessions
  *
  * @schema TraefikServiceSpecWeightedServicesSticky
  */
@@ -6119,6 +7458,15 @@ export interface TraefikServiceSpecWeightedStickyCookie {
   readonly httpOnly?: boolean;
 
   /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema TraefikServiceSpecWeightedStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
+
+  /**
    * Name defines the Cookie name.
    *
    * @schema TraefikServiceSpecWeightedStickyCookie#name
@@ -6150,6 +7498,7 @@ export function toJson_TraefikServiceSpecWeightedStickyCookie(obj: TraefikServic
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,
@@ -6158,6 +7507,40 @@ export function toJson_TraefikServiceSpecWeightedStickyCookie(obj: TraefikServic
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, quote-props */
+
+/**
+ * Interval defines the frequency of the health check calls.
+ * Default: 30s
+ *
+ * @schema TraefikServiceSpecMirroringMirrorsHealthCheckInterval
+ */
+export class TraefikServiceSpecMirroringMirrorsHealthCheckInterval {
+  public static fromNumber(value: number): TraefikServiceSpecMirroringMirrorsHealthCheckInterval {
+    return new TraefikServiceSpecMirroringMirrorsHealthCheckInterval(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecMirroringMirrorsHealthCheckInterval {
+    return new TraefikServiceSpecMirroringMirrorsHealthCheckInterval(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+ * Default: 5s
+ *
+ * @schema TraefikServiceSpecMirroringMirrorsHealthCheckTimeout
+ */
+export class TraefikServiceSpecMirroringMirrorsHealthCheckTimeout {
+  public static fromNumber(value: number): TraefikServiceSpecMirroringMirrorsHealthCheckTimeout {
+    return new TraefikServiceSpecMirroringMirrorsHealthCheckTimeout(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecMirroringMirrorsHealthCheckTimeout {
+    return new TraefikServiceSpecMirroringMirrorsHealthCheckTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
 
 /**
  * Cookie defines the sticky cookie configuration.
@@ -6171,6 +7554,15 @@ export interface TraefikServiceSpecMirroringMirrorsStickyCookie {
    * @schema TraefikServiceSpecMirroringMirrorsStickyCookie#httpOnly
    */
   readonly httpOnly?: boolean;
+
+  /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema TraefikServiceSpecMirroringMirrorsStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
 
   /**
    * Name defines the Cookie name.
@@ -6204,6 +7596,7 @@ export function toJson_TraefikServiceSpecMirroringMirrorsStickyCookie(obj: Traef
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,
@@ -6212,6 +7605,40 @@ export function toJson_TraefikServiceSpecMirroringMirrorsStickyCookie(obj: Traef
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, quote-props */
+
+/**
+ * Interval defines the frequency of the health check calls.
+ * Default: 30s
+ *
+ * @schema TraefikServiceSpecWeightedServicesHealthCheckInterval
+ */
+export class TraefikServiceSpecWeightedServicesHealthCheckInterval {
+  public static fromNumber(value: number): TraefikServiceSpecWeightedServicesHealthCheckInterval {
+    return new TraefikServiceSpecWeightedServicesHealthCheckInterval(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecWeightedServicesHealthCheckInterval {
+    return new TraefikServiceSpecWeightedServicesHealthCheckInterval(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Timeout defines the maximum duration Traefik will wait for a health check request before considering the server unhealthy.
+ * Default: 5s
+ *
+ * @schema TraefikServiceSpecWeightedServicesHealthCheckTimeout
+ */
+export class TraefikServiceSpecWeightedServicesHealthCheckTimeout {
+  public static fromNumber(value: number): TraefikServiceSpecWeightedServicesHealthCheckTimeout {
+    return new TraefikServiceSpecWeightedServicesHealthCheckTimeout(value);
+  }
+  public static fromString(value: string): TraefikServiceSpecWeightedServicesHealthCheckTimeout {
+    return new TraefikServiceSpecWeightedServicesHealthCheckTimeout(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
 
 /**
  * Cookie defines the sticky cookie configuration.
@@ -6225,6 +7652,15 @@ export interface TraefikServiceSpecWeightedServicesStickyCookie {
    * @schema TraefikServiceSpecWeightedServicesStickyCookie#httpOnly
    */
   readonly httpOnly?: boolean;
+
+  /**
+   * MaxAge indicates the number of seconds until the cookie expires.
+   * When set to a negative number, the cookie expires immediately.
+   * When set to zero, the cookie never expires.
+   *
+   * @schema TraefikServiceSpecWeightedServicesStickyCookie#maxAge
+   */
+  readonly maxAge?: number;
 
   /**
    * Name defines the Cookie name.
@@ -6258,6 +7694,7 @@ export function toJson_TraefikServiceSpecWeightedServicesStickyCookie(obj: Traef
   if (obj === undefined) { return undefined; }
   const result = {
     'httpOnly': obj.httpOnly,
+    'maxAge': obj.maxAge,
     'name': obj.name,
     'sameSite': obj.sameSite,
     'secure': obj.secure,

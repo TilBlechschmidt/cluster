@@ -1,9 +1,9 @@
 import { Construct } from 'constructs';
 import { Helm, Lazy } from 'cdk8s';
 import { Certificate, Issuer } from '../../imports/cert-manager.io';
-import { ConfigMap, Secret } from 'cdk8s-plus-26';
-import { HelmChartConfig } from '../../imports/helm.cattle.io';
+import { Secret } from 'cdk8s-plus-26';
 import { resolveNamespace } from '../../helpers';
+import { TlsStore } from '../../imports/traefik.io';
 
 interface CertManagerProps {
     acme: {
@@ -102,23 +102,15 @@ export class CertManager extends Construct {
 
         this.issuer.addDependency(manager);
 
-        new ConfigMap(this, 'traefik-config', {
+        new TlsStore(this, 'tls', {
             metadata: {
-                name: "traefik-cert-config",
-                namespace: this.traefikNamespace
-            },
-            data: {
-                "dynamic.toml": Lazy.any({ produce: () => this._synthConfig() })
-            }
-        });
-
-        new HelmChartConfig(this, 'traefik-values', {
-            metadata: {
-                name: "traefik",
-                namespace: this.traefikNamespace
+                name: 'default',
+                namespace: this.traefikNamespace,
             },
             spec: {
-                valuesContent: Lazy.any({ produce: () => this._synthValues() })
+                certificates: Lazy.any({
+                    produce: () => this.domains.map(root => ({ secretName: this.secretName(root) }))
+                })
             }
         });
     }
@@ -151,52 +143,7 @@ export class CertManager extends Construct {
         return domain;
     }
 
-    _synthConfig(): string {
-        return this.domains.map(root => `
-[[tls.certificates]]
-certFile = "/certs/${root}/tls.crt"
-keyFile = "/certs/${root}/tls.key"`).join('\n');
-    }
-
-    _synthValues(): string {
-        return TRAEFIK_VALUES_HEAD + this.domains.map(root => `
-  - name: ${this.secretName(root)}
-    mountPath: "/certs/${root}"
-    type: secret`).join('\n');
-    }
-
     private secretName(root: string): string {
         return `tls-${root}`
     }
 }
-
-const TRAEFIK_VALUES_HEAD = `
-logs:
-  access:
-    enabled: true
-    filePath: /var/log/traefik/access.log
-service:
-  spec:
-    externalTrafficPolicy: Local
-additionalArguments:
-  - "--providers.file.filename=/config/dynamic.toml"
-  - "--accessLog.filters.statusCodes=400-499"
-ports:
-  websecure:
-    http3:
-      enabled: true
-      advertisedPort: 443
-additionalVolumeMounts:
-  - mountPath: /var/log/traefik
-    name: access-logs
-deployment:
-  additionalVolumes:
-    - name: access-logs
-      hostPath:
-        path: /var/log/traefik
-        type: DirectoryOrCreate
-volumes:
-  - name: traefik-cert-config
-    mountPath: "/config"
-    type: configMap
-`;
