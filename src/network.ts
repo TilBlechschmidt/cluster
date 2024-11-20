@@ -29,7 +29,7 @@ export function restrictToLocalNetwork(scope: Construct): MiddlewareIdentifier {
             // Additionally, traffic from localhost is actually mapped to the K3s gateway IP!
             // So technically the localhost range is not even needed ...
             sourceRange: ["127.0.0.1/32", "10.0.0.0/8"],
-            rejectStatusCode: 404,
+            rejectStatusCode: 503,
         }
     });
 }
