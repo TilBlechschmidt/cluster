@@ -46,7 +46,7 @@ export class Flux extends Chart {
                     from: [{
                         namespaceSelector: {
                             matchLabels: {
-                                "kubernetes.io/metadata.name": "kube-system"
+                                "kubernetes.io/metadata.name": "infra"
                             }
                         }
                     }]
