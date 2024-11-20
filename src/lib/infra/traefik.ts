@@ -39,7 +39,8 @@ export class Traefik extends Construct {
             }
         };
 
-        // TODO Add HTTP3 config
+        // TODO Add HTTP3 config (actually needs proper IPv6 setup to work ... ugh)
+        //
         // ports:
         //   websecure:
         //     http3:
