@@ -1,4 +1,4 @@
-import { Middleware, MiddlewareSpec } from "./imports/traefik.containo.us";
+import { Middleware, MiddlewareSpec } from "./imports/traefik.io";
 import { Construct } from 'constructs';
 import { resolveId, resolveNamespace } from "./helpers";
 import { Ingress } from "cdk8s-plus-26";
@@ -24,11 +24,12 @@ export function attachMiddlewares(ingress: Ingress, middlewares: MiddlewareIdent
 
 export function restrictToLocalNetwork(scope: Construct): MiddlewareIdentifier {
     return createMiddleware(scope, 'local-only', {
-        ipWhiteList: {
+        ipAllowList: {
             // The /8 subnet just so happens to cover the cluster pod CIDR as well as the local network
             // Additionally, traffic from localhost is actually mapped to the K3s gateway IP!
             // So technically the localhost range is not even needed ...
-            sourceRange: ["127.0.0.1/32", "10.0.0.0/8"]
+            sourceRange: ["127.0.0.1/32", "10.0.0.0/8"],
+            rejectStatusCode: 404,
         }
     });
 }
