@@ -19,7 +19,7 @@ export class KubeSystem extends Chart {
                     tibl.dev:53 {
                       log
                       errors
-                      rewrite name regex (.*\.)?tibl.dev traefik.kube-system.svc.cluster.local answer auto
+                      rewrite name regex (.*\.)?tibl.dev traefik.infra.svc.cluster.local answer auto
                       kubernetes cluster.local 10.0.0.0/24
                       forward . /etc/resolv.conf
                       cache 30
