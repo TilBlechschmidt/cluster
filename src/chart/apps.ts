@@ -22,6 +22,7 @@ import { AudioBookShelf } from '../lib/app/audiobookshelf';
 import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 import { HomeAssistant } from '../lib/app/hass';
 import { Paperless } from '../lib/app/paperless';
+import { Radicale } from '../lib/app/radicale';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -137,7 +138,12 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless]) {
+        const radicale = new Radicale(this, 'radicale', {
+            domain: props.infra.certManager.registerDomain('cal.tibl.dev'),
+            ldap: props.infra.ldap
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, radicale]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
