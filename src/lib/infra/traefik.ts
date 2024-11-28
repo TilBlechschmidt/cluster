@@ -39,6 +39,29 @@ export class Traefik extends Construct {
             }
         };
 
+        const timeouts = {
+            ports: {
+                web: {
+                    transport: {
+                        respondingTimeouts: {
+                            readTimeout: '600s',
+                            writeTimeout: '600s',
+                            idleTimeout: '180s',
+                        }
+                    }
+                },
+                websecure: {
+                    transport: {
+                        respondingTimeouts: {
+                            readTimeout: '600s',
+                            writeTimeout: '600s',
+                            idleTimeout: '180s',
+                        }
+                    }
+                },
+            }
+        };
+
         // TODO Add HTTP3 config (actually needs proper IPv6 setup to work ... ugh)
         //
         // ports:
@@ -62,6 +85,7 @@ export class Traefik extends Construct {
             values: {
                 ...accessLog,
                 ...externalTrafficPolicy,
+                ...timeouts,
             }
         });
     }
