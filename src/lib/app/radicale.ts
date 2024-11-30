@@ -14,7 +14,7 @@ export class Radicale extends WebApp {
     constructor(scope: Construct, id: string, props: RadicaleProps) {
         super(scope, id, {
             domain: props.domain,
-            image: 'themegatb/docker-radicale:just-a-test-ldap',
+            image: 'themegatb/docker-radicale:add-ldap',
             port: 5232,
             unsafeMode: false
         });
