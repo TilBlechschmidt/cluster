@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { Helm, Lazy } from 'cdk8s';
-import { Certificate, Issuer } from '../../imports/cert-manager.io';
+import { Certificate, ClusterIssuer } from '../../imports/cert-manager.io';
 import { Secret } from 'cdk8s-plus-26';
 import { resolveNamespace } from '../../helpers';
 import { TlsStore } from '../../imports/traefik.io';
@@ -40,7 +40,7 @@ export class Domain {
 }
 
 export class CertManager extends Construct {
-    issuer: Issuer;
+    issuer: ClusterIssuer;
     domains: string[];
 
     private traefikNamespace: string;
@@ -68,17 +68,11 @@ export class CertManager extends Construct {
         });
 
         const cloudflareToken = new Secret(this, 'cloudflare-token', {
-            metadata: {
-                name: 'cloudflare',
-                namespace: this.traefikNamespace
-            }
+            metadata: { name: 'cloudflare' }
         });
         cloudflareToken.addStringData("token", props.cloudflareAccountKey);
 
-        this.issuer = new Issuer(this, 'cloudflare', {
-            metadata: {
-                namespace: this.traefikNamespace
-            },
+        this.issuer = new ClusterIssuer(this, 'cloudflare', {
             spec: {
                 acme: {
                     email: props.acme.email,
@@ -91,7 +85,7 @@ export class CertManager extends Construct {
                             cloudflare: {
                                 apiTokenSecretRef: {
                                     name: cloudflareToken.name,
-                                    key: "token"
+                                    key: "token",
                                 }
                             }
                         }
