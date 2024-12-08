@@ -23,6 +23,8 @@ import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 import { HomeAssistant } from '../lib/app/hass';
 import { Paperless } from '../lib/app/paperless';
 import { Radicale } from '../lib/app/radicale';
+import { Spliit } from '../lib/app/spliit';
+import { Mumble } from '../lib/app/mumble';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -142,6 +144,12 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('cal.tibl.dev'),
             ldap: props.infra.ldap
         });
+
+        new Spliit(this, 'spliit', {
+            domain: props.infra.certManager.registerDomain('split.tibl.dev'),
+        });
+
+        new Mumble(this, 'mumble', props.infra.certManager);
 
         for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, radicale]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
