@@ -59,6 +59,7 @@ export class HomeAssistant extends Construct {
         container.mount('/dev/ttyUSB0', Volume.fromHostPath(this, 'zigbee', 'zigbee', { path: '/dev/ttyUSB0', type: HostPathVolumeType.CHAR_DEVICE }));
 
         this.deployWhisper();
+        this.deployPiper();
     }
 
     deployWhisper() {
@@ -89,5 +90,39 @@ export class HomeAssistant extends Construct {
         });
 
         container.mount('/config', createHostPathVolume(this, 'whisper-model'));
+    }
+
+    deployPiper() {
+        const service = new kplus.Service(this, 'wyoming-piper', {
+            type: kplus.ServiceType.CLUSTER_IP,
+            ports: [{ port: 80, targetPort: 10200 }],
+        });
+
+        const statefulSet = new kplus.StatefulSet(this, 'piper', { service });
+
+        const container = statefulSet.addContainer({
+            image: 'ghcr.io/linuxserver/piper:1.4.0',
+            envVariables: obj2env({
+                PUID: '1000',
+                PGID: '1000',
+                TZ: 'Etc/UTC',
+                PIPER_VOICE: 'en_US-lessac-medium',
+                PIPER_LENGTH: '1.0',
+                PIPER_NOISE: '0.667',
+                PIPER_NOISEW: '0.333',
+                PIPER_SPEAKER: '0',
+                PIPER_PROCS: '1',
+            }),
+            ports: [{ number: 10200 }],
+            securityContext: {
+                ensureNonRoot: false,
+                readOnlyRootFilesystem: false,
+                privileged: true,
+                allowPrivilegeEscalation: true,
+            },
+        });
+
+        container.mount('/config', createHostPathVolume(this, 'piper-model'));
+
     }
 }
