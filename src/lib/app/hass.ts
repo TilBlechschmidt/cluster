@@ -26,7 +26,7 @@ export class HomeAssistant extends Construct {
         const statefulSet = new kplus.StatefulSet(this, 'app', { service, hostNetwork: true });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/home-assistant/home-assistant:2024.11',
+            image: 'ghcr.io/home-assistant/home-assistant:2024.12.5',
             envVariables: obj2env({
                 TZ: 'Europe/Berlin'
             }),
