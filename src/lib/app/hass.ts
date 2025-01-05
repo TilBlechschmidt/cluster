@@ -30,7 +30,7 @@ export class HomeAssistant extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/home-assistant/home-assistant:2024.12.5',
+            image: 'ghcr.io/home-assistant/home-assistant:2025.1.0',
             envVariables: obj2env({
                 TZ: 'Europe/Berlin'
             }),
@@ -76,7 +76,7 @@ export class HomeAssistant extends Construct {
                 PUID: '1000',
                 PGID: '1000',
                 TZ: 'Etc/UTC',
-                WHISPER_MODEL: 'tiny-int8',
+                WHISPER_MODEL: 'base-int8',
                 WHISPER_BEAM: '1',
                 WHISPER_LANG: 'en'
             }),
@@ -123,6 +123,5 @@ export class HomeAssistant extends Construct {
         });
 
         container.mount('/config', createHostPathVolume(this, 'piper-model'));
-
     }
 }
