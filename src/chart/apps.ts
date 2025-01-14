@@ -69,13 +69,12 @@ export class Apps extends Chart {
             domain: registerDomain('l.tibl.dev')
         });
 
-        // Disabled as it is somehow broken and spams the upstream API ...
-        // new WebApp(this, 'gpcache', {
-        //     domain: registerDomain('gp.tibl.dev'),
-        //     image: 'ghcr.io/tilblechschmidt/gpcache:sha-8708578',
-        //     port: 3000,
-        //     env: secrets.gpcache,
-        // });
+        new WebApp(this, 'gpcache', {
+            domain: registerDomain('gp.tibl.dev'),
+            image: 'ghcr.io/tilblechschmidt/gpcache:sha-9657754',
+            port: 3000,
+            env: secrets.gpcache,
+        });
 
         const audioBookShelf = new AudioBookShelf(this, 'audiobookshelf', {
             domain: registerDomain('audiobook.tibl.dev'),
