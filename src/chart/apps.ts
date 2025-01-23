@@ -25,6 +25,7 @@ import { Paperless } from '../lib/app/paperless';
 import { Radicale } from '../lib/app/radicale';
 import { Spliit } from '../lib/app/spliit';
 import { Mumble } from '../lib/app/mumble';
+import { Miniflux } from '../lib/app/miniflux';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -150,7 +151,12 @@ export class Apps extends Chart {
 
         new Mumble(this, 'mumble', props.infra.certManager);
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, radicale]) {
+        let reader = new Miniflux(this, 'miniflux', {
+            domain: props.infra.certManager.registerDomain('reader.tibl.dev'),
+            oidc: props.infra.oidc
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, radicale, reader]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
