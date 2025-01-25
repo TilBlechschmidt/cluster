@@ -41,7 +41,7 @@ export class Paperless extends WebApp {
     constructor(scope: Construct, id: string, props: PaperlessProps) {
         super(scope, id, {
             domain: props.domain,
-            image: 'ghcr.io/paperless-ngx/paperless-ngx:2.13',
+            image: 'ghcr.io/paperless-ngx/paperless-ngx:2.14.5',
             port: 8000,
             unsafeMode: true,
             env: {
@@ -134,7 +134,7 @@ export class Paperless extends WebApp {
     setupGotenberg() {
         const gotenberg = new kplus.StatefulSet(this, 'gotenberg', {
             containers: [{
-                image: 'docker.io/gotenberg/gotenberg:8.7',
+                image: 'docker.io/gotenberg/gotenberg:8.15.3',
                 portNumber: 3000,
                 resources: {},
                 securityContext: {
