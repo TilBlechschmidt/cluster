@@ -2,10 +2,11 @@ import { Construct } from "constructs";
 import { WebApp } from "../helpers/webApp";
 import { Domain } from "../infra/certManager";
 import { Redis } from "../helpers/db/redis";
-import { EnvValue, HttpIngressPathType, Ingress, IngressBackend } from "cdk8s-plus-26";
+import { ConfigMap, EnvValue, HttpIngressPathType, Ingress, IngressBackend, Volume } from "cdk8s-plus-26";
 import * as kplus from 'cdk8s-plus-26';
 import { createHostPathVolume, generateSecret } from "../../helpers";
 import { Authelia } from "../infra/authelia";
+import { readFileSync } from 'fs';
 
 export interface PaperlessProps {
     readonly domain: Domain;
@@ -107,6 +108,7 @@ export class Paperless extends WebApp {
         this.setupRedis();
         this.setupTika();
         this.setupGotenberg();
+        this.setupScripts();
     }
 
     setupRedis() {
@@ -203,5 +205,21 @@ export class Paperless extends WebApp {
         });
 
         this.container.env.copyFrom(kplus.Env.fromSecret(secret));
+    }
+
+    setupScripts() {
+        const postConsumption = readFileSync('src/scripts/paperless-post-consumption.sh', 'utf8');
+
+        const configMap = new ConfigMap(this, 'scripts', {
+            data: {
+                "post-consumption.sh": postConsumption,
+            }
+        });
+
+        this.container.mount('/scripts', Volume.fromConfigMap(this, 'scripts-mount', configMap, {
+            defaultMode: 0o777
+        }));
+
+        this.container.env.addVariable("PAPERLESS_POST_CONSUME_SCRIPT", EnvValue.fromValue("/scripts/post-consumption.sh"));
     }
 }
