@@ -20,7 +20,7 @@ export interface UserConfig {
     readonly paperless?: {
         readonly url: string,
         readonly token: string,
-        readonly customFields: { field: number, value: number }[],
+        readonly customFields: { field: number, value: any }[],
     }
 
     readonly telegram?: {
@@ -74,7 +74,7 @@ export class ScanServer extends Construct {
                 group: 1000,
             },
             containers: [{
-                image: 'ghcr.io/tilblechschmidt/scan-server:sha-8f1714d',
+                image: 'ghcr.io/tilblechschmidt/scan-server:sha-92e54c2',
                 ports: [{ number: 3030 }],
                 envFrom: [Env.fromSecret(secret)],
                 resources: {}

@@ -31,6 +31,8 @@ export interface PaperlessProps {
     //
     // NOTE: This MUST be set on first startup or else the admin user WILL NOT be created!
     readonly setup?: PaperlessSetupProps;
+
+    readonly token?: string;
 }
 
 export interface PaperlessSetupProps {
@@ -161,6 +163,9 @@ export class Paperless extends WebApp {
             PAPERLESS_DISABLE_REGULAR_LOGIN: '1',
             PAPERLESS_REDIRECT_LOGIN_TO_SSO: '1',
             PAPERLESS_SOCIAL_AUTO_SIGNUP: '1',
+
+            // Add a token for scripts
+            PAPERLESS_SCRIPT_AUTH_TOKEN: props.token,
         };
 
         if (props.setup) {

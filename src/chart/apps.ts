@@ -137,7 +137,8 @@ export class Apps extends Chart {
 
         const paperless = new Paperless(this, 'paperless', {
             domain: props.infra.certManager.registerDomain('paper.tibl.dev'),
-            oidc: props.infra.oidc
+            oidc: props.infra.oidc,
+            token: secrets.scanServer.tibl.paperless.token
         });
 
         const radicale = new Radicale(this, 'radicale', {

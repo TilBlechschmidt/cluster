@@ -1,23 +1,12 @@
 #!/usr/bin/env bash
 
-echo "
+# Add the source custom field to docs ingested from mail
+if [[ $DOCUMENT_SOURCE_PATH == *"originals/mail-ingest"* ]]; then
+    echo "Document $DOCUMENT_ID originates from mail, attaching source and removing storage path"
 
-A document with an id of ${DOCUMENT_ID} was just consumed.  I know the
-following additional information about it:
-
-* Generated File Name: ${DOCUMENT_FILE_NAME}
-* Archive Path: ${DOCUMENT_ARCHIVE_PATH}
-* Source Path: ${DOCUMENT_SOURCE_PATH}
-* Created: ${DOCUMENT_CREATED}
-* Added: ${DOCUMENT_ADDED}
-* Modified: ${DOCUMENT_MODIFIED}
-* Thumbnail Path: ${DOCUMENT_THUMBNAIL_PATH}
-* Download URL: ${DOCUMENT_DOWNLOAD_URL}
-* Thumbnail URL: ${DOCUMENT_THUMBNAIL_URL}
-* Owner Name: ${DOCUMENT_OWNER}
-* Correspondent: ${DOCUMENT_CORRESPONDENT}
-* Tags: ${DOCUMENT_TAGS}
-
-It was consumed with the passphrase ${PASSPHRASE}
-
-"
+    curl -X PATCH --silent --show-error --fail --output /dev/null \
+        -H "Authorization: Token $PAPERLESS_SCRIPT_AUTH_TOKEN" \
+        -H "Content-type: application/json" \
+        --data '{"storage_path": null, "custom_fields": [{ "field": 1, "value": "tQSknnSdHRqT8RF8" }]}' \
+        $PAPERLESS_URL/api/documents/$DOCUMENT_ID/
+fi
