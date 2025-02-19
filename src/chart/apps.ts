@@ -141,7 +141,7 @@ export class Apps extends Chart {
             token: secrets.scanServer.tibl.paperless.token
         });
 
-        const radicale = new Radicale(this, 'radicale', {
+        new Radicale(this, 'radicale', {
             domain: props.infra.certManager.registerDomain('cal.tibl.dev'),
             ldap: props.infra.ldap
         });
@@ -157,7 +157,7 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, radicale, reader]) {
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
