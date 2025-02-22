@@ -5,11 +5,12 @@ import { obj2env } from '../../helpers';
 import { Domain } from '../infra/certManager';
 
 export interface WebAppProps {
-    domain: Domain;
+    domain?: Domain;
 
     image: string;
     port: number;
 
+    command?: string[];
     args?: string[];
     env?: { [key: string]: string };
 
@@ -19,8 +20,9 @@ export interface WebAppProps {
 
 export class WebApp extends Construct {
     container: Container
-    ingress: Ingress
+    ingress!: Ingress
     service: Service
+    statefulSet: StatefulSet
 
     constructor(scope: Construct, id: string, props: WebAppProps) {
         super(scope, id);
@@ -38,11 +40,12 @@ export class WebApp extends Construct {
             ports: [{ port: 80, targetPort: props.port }],
         });
 
-        const statefulSet = new StatefulSet(this, 'app', { service, hostNetwork: props.hostNetwork });
+        this.statefulSet = new StatefulSet(this, 'app', { service, hostNetwork: props.hostNetwork });
 
-        this.container = statefulSet.addContainer({
+        this.container = this.statefulSet.addContainer({
             image: props.image,
             portNumber: props.port,
+            command: props.command,
             args: props.args,
             securityContext,
             envVariables: obj2env(props.env || {}),
@@ -53,11 +56,13 @@ export class WebApp extends Construct {
 
         this.service = service;
 
-        this.ingress = new Ingress(this, props.domain.fqdn, {
-            rules: [{
-                host: props.domain.fqdn,
-                backend: IngressBackend.fromService(service)
-            }]
-        });
+        if (props.domain) {
+            this.ingress = new Ingress(this, props.domain.fqdn, {
+                rules: [{
+                    host: props.domain.fqdn,
+                    backend: IngressBackend.fromService(service)
+                }]
+            });
+        }
     }
 }
