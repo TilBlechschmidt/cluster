@@ -4,7 +4,6 @@ import { Construct } from 'constructs';
 import { Namespace } from './namespace';
 
 import { Infra } from './infra';
-import { Vaultwarden } from '../lib/app/vaultwarden';
 import { GlAuth } from '../lib/infra/glauth';
 import { Authelia } from '../lib/infra/authelia';
 import { Immich } from '../lib/app/immich';
