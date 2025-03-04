@@ -26,6 +26,7 @@ import { Radicale } from '../lib/app/radicale';
 import { Spliit } from '../lib/app/spliit';
 import { Mumble } from '../lib/app/mumble';
 import { Miniflux } from '../lib/app/miniflux';
+import { ObsidianSync } from '../lib/app/obsidian-sync';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -157,7 +158,11 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader]) {
+        let obsidianSync = new ObsidianSync(this, 'obsidian-sync', {
+            domain: props.infra.certManager.registerDomain('obsidian.tibl.dev'),
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
