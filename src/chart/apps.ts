@@ -27,6 +27,7 @@ import { Spliit } from '../lib/app/spliit';
 import { Mumble } from '../lib/app/mumble';
 import { Miniflux } from '../lib/app/miniflux';
 import { ObsidianSync } from '../lib/app/obsidian-sync';
+import { Starbase80 } from '../lib/app/starbase80';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -162,7 +163,11 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('obsidian.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync]) {
+        let starbase80 = new Starbase80(this, 'starbase80', {
+            domain: props.infra.certManager.registerDomain('lab.tibl.dev'),
+        });
+
+        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }

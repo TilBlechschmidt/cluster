@@ -16,6 +16,8 @@ export interface WebAppProps {
 
     unsafeMode?: boolean;
     hostNetwork?: boolean;
+
+    instantTermination?: boolean;
 }
 
 export class WebApp extends Construct {
@@ -40,7 +42,11 @@ export class WebApp extends Construct {
             ports: [{ port: 80, targetPort: props.port }],
         });
 
-        this.statefulSet = new StatefulSet(this, 'app', { service, hostNetwork: props.hostNetwork });
+        this.statefulSet = new StatefulSet(this, 'app', {
+            service,
+            hostNetwork: props.hostNetwork,
+            terminationGracePeriod: props.instantTermination ? Duration.seconds(0) : Duration.seconds(30)
+        });
 
         this.container = this.statefulSet.addContainer({
             image: props.image,
