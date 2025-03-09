@@ -22,7 +22,7 @@ export class Immich extends Construct {
     constructor(scope: Construct, id: string, props: ImmichProps) {
         super(scope, id);
 
-        const version = 'v1.118.2';
+        const version = 'v1.129.0';
 
         const db = 'immich';
         const user = 'immich';
@@ -68,7 +68,7 @@ export class Immich extends Construct {
         config.oauth.clientSecret = props.oidc.registerClient(id, {
             description: 'Photo storage server',
             redirect_uris: [
-                'app.immich::///oauth-callback',
+                'app.immich:///oauth-callback',
                 `https://${props.domain.fqdn}/auth/login`,
                 `https://${props.domain.fqdn}/user-settings`
             ],
