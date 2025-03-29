@@ -28,6 +28,7 @@ import { Mumble } from '../lib/app/mumble';
 import { Miniflux } from '../lib/app/miniflux';
 import { ObsidianSync } from '../lib/app/obsidian-sync';
 import { Starbase80 } from '../lib/app/starbase80';
+import { Immich } from '../lib/app/immich';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -167,7 +168,13 @@ export class Apps extends Chart {
             domain: props.infra.certManager.registerDomain('lab.tibl.dev'),
         });
 
-        for (const app of [audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80]) {
+        let immich = new Immich(this, 'immich', {
+            domain: props.infra.certManager.registerDomain('photos.tibl.dev'),
+            uploadPath: '/mnt/raid/Media/Immich',
+            oidc: props.infra.oidc
+        });
+
+        for (const app of [immich, audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }

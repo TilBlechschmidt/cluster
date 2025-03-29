@@ -6,11 +6,8 @@ import { Namespace } from './namespace';
 import { Infra } from './infra';
 import { GlAuth } from '../lib/infra/glauth';
 import { Authelia } from '../lib/infra/authelia';
-import { Immich } from '../lib/app/immich';
 
 import secrets from '../../secrets.json';
-import { Mosquitto } from '../lib/helpers/db/mosquitto';
-import { attachMiddlewares, restrictToLocalNetwork } from '../network';
 
 export interface TestingProps extends ChartProps {
     readonly infra: Infra;
@@ -48,22 +45,12 @@ export class Testing extends Chart {
             }
         });
 
-        // const secret = oidc.registerClient('test', {
-        //     description: 'This is an example client for debug purposes',
-        //     redirect_uris: ['http://127.0.0.1:8080', 'http://127.0.0.1:8080/auth/callback'],
-        //     authorization_policy: 'one_factor'
-        // });
-
-        // console.error('Test OIDC secret:', secret);
-
-        let immich = new Immich(this, 'immich', {
-            domain: props.infra.certManager.registerDomain('photos.tibl.dev'),
-            uploadPath: '/mnt/raid/tmp-immich',
-            oidc
+        const secret = oidc.registerClient('test', {
+            description: 'This is an example client for debug purposes',
+            redirect_uris: ['http://127.0.0.1:8080', 'http://127.0.0.1:8080/auth/callback'],
+            authorization_policy: 'one_factor'
         });
 
-        attachMiddlewares(immich.ingress, [restrictToLocalNetwork(immich)]);
-
-        new Mosquitto(this, 'mqtt', {});
+        console.error('Test OIDC secret:', secret);
     }
 }

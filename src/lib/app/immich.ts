@@ -22,7 +22,7 @@ export class Immich extends Construct {
     constructor(scope: Construct, id: string, props: ImmichProps) {
         super(scope, id);
 
-        const version = 'v1.129.0';
+        const version = 'v1.130.3';
 
         const db = 'immich';
         const user = 'immich';
@@ -118,11 +118,11 @@ export class Immich extends Construct {
         //      We should figure out how to relax those permissions without just setting it globally with eudev.
         // server.containers[0].mount('/dev/dri', Volume.fromHostPath(this, 'igpu', 'igpu', { path: '/dev/dri' }));
 
-        server.containers[0].mount('/external-assets/family-archive', Volume.fromHostPath(this, 'family-archive', 'family-archive', {
-            path: '/mnt/raid/Media/Photos'
-        }), {
-            readOnly: true,
-        });
+        // server.containers[0].mount('/external-assets/family-archive', Volume.fromHostPath(this, 'family-archive', 'family-archive', {
+        //     path: '/mnt/raid/Media/Photos'
+        // }), {
+        //     readOnly: true,
+        // });
 
         this.ingress = new kplus.Ingress(this, props.domain.fqdn, {
             rules: [{
@@ -228,7 +228,7 @@ const DEFAULT_CONFIG = {
         "url": "",
         "clip": {
             "enabled": true,
-            "modelName": "ViT-B-16-SigLIP__webli"
+            "modelName": "ViT-B-16-SigLIP2__webli"
         },
         "duplicateDetection": {
             "enabled": true,
