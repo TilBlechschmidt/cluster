@@ -152,7 +152,7 @@ const DEFAULT_CONFIG = {
         "enabled": true
     },
     "theme": {
-        "customCss": ""
+        "customCss": ".storage-status { display: none !important; }"
     },
     "user": {
         "deleteDelay": 7
