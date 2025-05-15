@@ -55,7 +55,7 @@ export class CertManager extends Construct {
             releaseName: id,
             namespace: resolveNamespace(scope),
             chart: "cert-manager",
-            version: "v1.11.1",
+            version: "v1.17.2",
             repo: "https://charts.jetstack.io",
             values: {
                 installCRDs: true,
