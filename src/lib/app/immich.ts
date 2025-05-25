@@ -22,7 +22,7 @@ export class Immich extends Construct {
     constructor(scope: Construct, id: string, props: ImmichProps) {
         super(scope, id);
 
-        const version = 'v1.132.1';
+        const version = 'v1.133.1';
 
         const db = 'immich';
         const user = 'immich';
@@ -32,8 +32,7 @@ export class Immich extends Construct {
             database: db,
             user,
             password,
-            image: 'tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52',
-            args: ["postgres", "-c", "shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"],
+            image: 'ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0',
             securityContext: {
                 ensureNonRoot: true,
                 user: 1000,
@@ -42,7 +41,7 @@ export class Immich extends Construct {
         });
 
         const redis = new Redis(this, 'redis', {
-            image: 'docker.io/valkey/valkey:8-bookworm@sha256:42cba146593a5ea9a622002c1b7cba5da7be248650cbb64ecb9c6c33d29794b1'
+            image: 'docker.io/valkey/valkey:8-bookworm@sha256:ff21bc0f8194dc9c105b769aeabf9585fea6a8ed649c0781caeac5cb3c247884'
         });
 
         const ml = new kplus.StatefulSet(this, 'ml', {
