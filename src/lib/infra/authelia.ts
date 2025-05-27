@@ -317,7 +317,7 @@ const DEFAULT_CONFIG = {
         "secret_size": 32
     },
     "webauthn": {
-        "disable": false,
+        "disable": true,
         "display_name": "Authelia",
         "attestation_conveyance_preference": "indirect",
         "user_verification": "preferred",
