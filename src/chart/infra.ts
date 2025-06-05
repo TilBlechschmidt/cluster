@@ -87,7 +87,7 @@ export class Infra extends Chart {
                 cidr: '10.0.0.0/24'
             },
 
-            wildcards: { 'tibl.dev': '10.0.0.56' },
+            wildcards: { 'tibl.dev': '10.0.0.56', 'v2.tibl.dev': '192.168.64.13' },
             wildcardExclusions: ['backup.tibl.dev']
         });
 
