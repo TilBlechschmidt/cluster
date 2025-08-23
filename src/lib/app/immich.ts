@@ -22,7 +22,7 @@ export class Immich extends Construct {
     constructor(scope: Construct, id: string, props: ImmichProps) {
         super(scope, id);
 
-        const version = 'v1.133.1';
+        const version = 'v1.139.2';
 
         const db = 'immich';
         const user = 'immich';
@@ -32,7 +32,7 @@ export class Immich extends Construct {
             database: db,
             user,
             password,
-            image: 'ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0',
+            image: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.1-pgvectors0.2.0',
             securityContext: {
                 ensureNonRoot: true,
                 user: 1000,
@@ -41,7 +41,7 @@ export class Immich extends Construct {
         });
 
         const redis = new Redis(this, 'redis', {
-            image: 'docker.io/valkey/valkey:8-bookworm@sha256:ff21bc0f8194dc9c105b769aeabf9585fea6a8ed649c0781caeac5cb3c247884'
+            image: 'docker.io/valkey/valkey:8-bookworm@sha256:a137a2b60aca1a75130022d6bb96af423fefae4eb55faf395732db3544803280'
         });
 
         const ml = new kplus.StatefulSet(this, 'ml', {
@@ -59,7 +59,7 @@ export class Immich extends Construct {
 
         const config = DEFAULT_CONFIG;
         config.server.externalDomain = `https://${props.domain.fqdn}`;
-        config.machineLearning.url = `http://${ml.service.name}:3003`;
+        config.machineLearning.urls = [`http://${ml.service.name}:3003`];
 
         config.passwordLogin.enabled = props.passwordLoginEnabled || false;
         config.oauth.issuerUrl = props.oidc.discoveryUrl;
@@ -89,7 +89,6 @@ export class Immich extends Construct {
         const server = new kplus.StatefulSet(this, 'server', {
             containers: [{
                 image: `ghcr.io/immich-app/immich-server:${version}`,
-                command: ["/bin/bash", "./start.sh"],
                 portNumber: 2283,
                 resources: {},
                 securityContext: {
@@ -108,8 +107,8 @@ export class Immich extends Construct {
         ml.containers[0].mount('/cache', createHostPathVolume(this, 'ml-cache'));
 
         server.containers[0].mount('/custom-config', Volume.fromSecret(this, 'config-mount', configSecret));
-        server.containers[0].mount(`/usr/src/app/upload`, createHostPathVolume(this, 'data'));
-        server.containers[0].mount(`/usr/src/app/upload/upload`, Volume.fromHostPath(this, `upload-server`, `upload-server`, { path: props.uploadPath }));
+        server.containers[0].mount(`/data`, createHostPathVolume(this, 'data'));
+        server.containers[0].mount(`/data/upload`, Volume.fromHostPath(this, `upload-server`, `upload-server`, { path: props.uploadPath }));
 
         server.containers[0].mount('/dev/dri', Volume.fromHostPath(this, 'igpu', 'igpu', { path: '/dev/dri' }));
 
@@ -224,7 +223,7 @@ const DEFAULT_CONFIG = {
     },
     "machineLearning": {
         "enabled": true,
-        "url": "",
+        "urls": [""],
         "clip": {
             "enabled": true,
             "modelName": "ViT-B-16-SigLIP2__webli"
@@ -265,7 +264,6 @@ const DEFAULT_CONFIG = {
         "bframes": -1,
         "refs": 0,
         "gopSize": 0,
-        "npl": 0,
         "temporalAQ": false,
         "cqMode": "auto",
         "twoPass": false,
