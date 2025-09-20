@@ -21,7 +21,7 @@ export class Jrnl extends WebApp {
 
         super(scope, id, {
             domain: props.domain,
-            image: 'ghcr.io/tilblechschmidt/jrnl:sha-56098c4',
+            image: 'ghcr.io/tilblechschmidt/jrnl:sha-49627df',
             port: 8080,
             env: {
                 THOUGHT_STORAGE_LOCATION: "/var/lib/jrnl",
