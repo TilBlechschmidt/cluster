@@ -30,7 +30,7 @@ export class MusicAssistant extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/music-assistant/server:2.5.0',
+            image: 'ghcr.io/music-assistant/server:2.6.0',
             envVariables: obj2env({
                 TZ: 'Europe/Berlin'
             }),
