@@ -45,7 +45,7 @@ export class Jellyfin extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/jellyfin/jellyfin:10.10.0',
+            image: 'ghcr.io/jellyfin/jellyfin:10.10.7',
             envVariables,
             ports: [{ number: 8096 }],
             securityContext: {
