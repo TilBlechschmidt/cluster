@@ -176,7 +176,7 @@ export class Apps extends Chart {
         });
 
         let pidgeonPod = new PidgeonPod(this, 'pidgeonpod', {
-            domain: props.infra.certManager.registerDomain('podcast')
+            domain: props.infra.certManager.registerDomain('podcast.tibl.dev')
         });
 
         for (const app of [immich, audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80, pidgeonPod]) {
