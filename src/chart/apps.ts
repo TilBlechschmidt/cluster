@@ -29,6 +29,7 @@ import { Miniflux } from '../lib/app/miniflux';
 import { ObsidianSync } from '../lib/app/obsidian-sync';
 import { Starbase80 } from '../lib/app/starbase80';
 import { Immich } from '../lib/app/immich';
+import { PidgeonPod } from '../lib/app/pidgeonpod';
 
 export interface AppsProps extends ChartProps {
     readonly infra: Infra;
@@ -174,7 +175,11 @@ export class Apps extends Chart {
             oidc: props.infra.oidc
         });
 
-        for (const app of [immich, audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80]) {
+        let pidgeonPod = new PidgeonPod(this, 'pidgeonpod', {
+            domain: props.infra.certManager.registerDomain('podcast')
+        });
+
+        for (const app of [immich, audioBookShelf, tubeArchivist, jrnl, scanServer, hass, paperless, reader, obsidianSync, starbase80, pidgeonPod]) {
             attachMiddlewares(app.ingress, [restrictToLocalNetwork(app)]);
         }
     }
