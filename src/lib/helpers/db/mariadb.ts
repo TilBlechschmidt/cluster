@@ -5,6 +5,12 @@ import { createHostPathVolume, obj2env } from '../../../helpers';
 export interface MariaDbProps {
     /// Password for the root user
     readonly password: string;
+
+    readonly user?: {
+        readonly name: string;
+        readonly password: string;
+        readonly database: string;
+    }
 }
 
 export class MariaDb extends Construct {
@@ -18,6 +24,12 @@ export class MariaDb extends Construct {
                 MYSQL_ROOT_PASSWORD: props.password
             }
         });
+
+        if (props.user) {
+            secret.addStringData("MYSQL_USER", props.user.name);
+            secret.addStringData("MYSQL_PASSWORD", props.user.password);
+            secret.addStringData("MYSQL_DATABASE", props.user.database);
+        }
 
         const service = new kplus.Service(this, id, {
             type: kplus.ServiceType.CLUSTER_IP,
