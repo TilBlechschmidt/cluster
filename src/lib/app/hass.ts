@@ -30,7 +30,7 @@ export class HomeAssistant extends Construct {
         });
 
         const container = statefulSet.addContainer({
-            image: 'ghcr.io/home-assistant/home-assistant:2025.11.3',
+            image: 'ghcr.io/home-assistant/home-assistant:2025.12.4',
             envVariables: obj2env({
                 TZ: 'Europe/Berlin'
             }),
