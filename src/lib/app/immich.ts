@@ -22,7 +22,7 @@ export class Immich extends Construct {
     constructor(scope: Construct, id: string, props: ImmichProps) {
         super(scope, id);
 
-        const version = 'v1.139.2';
+        const version = 'v2.5.2';
 
         const db = 'immich';
         const user = 'immich';
@@ -32,7 +32,7 @@ export class Immich extends Construct {
             database: db,
             user,
             password,
-            image: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.1-pgvectors0.2.0',
+            image: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23',
             securityContext: {
                 ensureNonRoot: true,
                 user: 1000,
@@ -41,7 +41,7 @@ export class Immich extends Construct {
         });
 
         const redis = new Redis(this, 'redis', {
-            image: 'docker.io/valkey/valkey:8-bookworm@sha256:a137a2b60aca1a75130022d6bb96af423fefae4eb55faf395732db3544803280'
+            image: 'docker.io/valkey/valkey:9@sha256:546304417feac0874c3dd576e0952c6bb8f06bb4093ea0c9ca303c73cf458f63'
         });
 
         const ml = new kplus.StatefulSet(this, 'ml', {
