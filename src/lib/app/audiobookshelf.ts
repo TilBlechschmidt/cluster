@@ -17,7 +17,8 @@ export class AudioBookShelf extends WebApp {
             description: 'audiobookshelf',
             redirect_uris: [
                 `https://${props.domain.fqdn}/auth/openid/callback`,
-                'audiobookshelf://oauth'
+                'audiobookshelf://oauth',
+                'stillapp://oauth'
             ]
         });
 
